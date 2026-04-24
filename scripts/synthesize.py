@@ -37,15 +37,23 @@ TOPIC_LABELS = {
 SYNTH_PROMPT = """You are synthesizing one day of Claude-assisted work for Francis.
 Day: {dow} {date}. {kept} of {total} sessions kept after filtering.
 
-SESSIONS:
+SESSIONS (each with its own raw decisions/open items extracted per-session):
 {blob}
 
 Return ONLY valid JSON (no markdown fence, no preamble), shape:
 {{
   "summary": "2-3 sentence terse first-person recap across topics. No fluff. No 'the user'. Mention the dominant thread and any notable detour.",
   "honest": "One honest line — under 14 words. Slightly dry. How the day actually felt.",
-  "lessons": ["3-5 short first-person past-tense lessons, under 16 words each. Patterns, mistakes, insights — NOT a to-do list."]
+  "lessons": ["3-5 first-person past-tense lessons, under 16 words each. Patterns, mistakes, insights — NOT a to-do list."],
+  "key_decisions": ["UP TO 5 judgment calls that actually mattered, rewritten as short headlines under 10 words each. DO NOT include micro-actions like 'ran the script' or 'saved to folder' — only real choices I made. If fewer than 5 real decisions today, return fewer."],
+  "key_open": ["UP TO 5 unresolved threads that matter tomorrow, rewritten as short headlines under 10 words each. Skip trivial follow-ups. If fewer than 5 real open threads, return fewer."]
 }}
+
+Selection rules:
+- Aggressive pruning. Fewer, better entries beats a complete list.
+- Rewrite for scannability — the rail is 260px wide. Headlines, not sentences.
+- Drop anything that's just an action log ('converted posts to markdown') unless it's a decision point.
+- Prefer decisions/opens that span sessions or topics over single-session ones.
 """
 
 
@@ -125,10 +133,20 @@ def main() -> int:
     kept = data.get("kept", [])
     dropped = data.get("filtered_out", [])
 
-    # LLM synthesis
+    # Raw concat: per-session decisions and open items before curation.
+    # Used as fallback if LLM synthesis fails, and for the +N more disclosure.
+    raw_decisions: list[str] = []
+    raw_open: list[str] = []
+    for s in kept:
+        raw_decisions.extend(s.get("decisions") or [])
+        raw_open.extend(s.get("open") or [])
+
+    # LLM synthesis — produces summary/honest/lessons PLUS curated key_decisions + key_open
     summary = ""
     honest = "—"
     lessons: list[str] = []
+    key_decisions: list[str] = []
+    key_open: list[str] = []
     if kept and not args.no_llm:
         print(llm.banner(), file=sys.stderr)
         blob = build_session_blob(kept)
@@ -138,7 +156,7 @@ def main() -> int:
             blob=blob,
         )
         try:
-            text = llm.complete(prompt, role="synth", max_tokens=800)
+            text = llm.complete(prompt, role="synth", max_tokens=1200)
             import re
             m = re.search(r"\{[\s\S]*\}", text)
             if m:
@@ -146,17 +164,19 @@ def main() -> int:
                 summary = parsed.get("summary", "")
                 honest = parsed.get("honest", "") or "—"
                 lessons = parsed.get("lessons", []) or []
+                key_decisions = (parsed.get("key_decisions", []) or [])[:5]
+                key_open = (parsed.get("key_open", []) or [])[:5]
         except Exception as e:
             print(f"[synthesize] LLM error, using placeholders: {e}", file=sys.stderr)
 
     if not summary:
         summary = f"{len(kept)} sessions across {len({s.get('topic') for s in kept})} topics." if kept else "Nothing captured today."
 
-    decisions = []
-    open_threads = []
-    for s in kept:
-        decisions.extend(s.get("decisions") or [])
-        open_threads.extend(s.get("open") or [])
+    # Fallback if LLM didn't return curated lists: first 5 of the raw concat
+    decisions = key_decisions or raw_decisions[:5]
+    open_threads = key_open or raw_open[:5]
+    decisions_extra = max(0, len(raw_decisions) - len(decisions))
+    open_extra = max(0, len(raw_open) - len(open_threads))
 
     day = {
         "date": args.date,
@@ -169,8 +189,10 @@ def main() -> int:
         "lessons": lessons,
         "items": [to_reader_item(s) for s in kept],
         "filtered_out": [{"topic": d.get("topic_guess") or d.get("reason"), "device": d.get("device", "?"), "dur": d.get("duration_min", 0)} for d in dropped],
-        "decisions": decisions[:12],
-        "open_threads": open_threads[:12],
+        "decisions": decisions,
+        "open_threads": open_threads,
+        "decisions_extra": decisions_extra,
+        "open_extra": open_extra,
     }
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)

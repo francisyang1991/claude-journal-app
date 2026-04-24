@@ -10,14 +10,14 @@
   ],
   "sessions_total": 8,
   "sessions_kept": 6,
-  "honest": "Productive but fragmented, like context-switching between three different brain states.",
-  "summary": "Prepped for a tech interview while juggling product design for an AI coach and competitor analysis, with a brief detour into MetaGlass SDK setup.",
+  "honest": "Productive but fragmented, chasing too many parallel threads.",
+  "summary": "Focused on product design and technical execution across AI tools and SDKs. Dominant thread was refining the AI goal coach, with a notable detour into MetaGlass SDK exploration.",
   "lessons": [
-    "Dark navy/teal with amber makes slides pop without being distracting.",
-    "Direct push to main works when the change is small and scoped.",
-    "Real SDK docs often drift from bundled skill documentation.",
-    "Intersection strategy beats competing on single features.",
-    "Start users with small actions before showing the full plan."
+    "Dark navy/teal palette works for technical deep dives.",
+    "Intersection strategy beats single-axis competition.",
+    "Async SDKs require real-world testing, not docs.",
+    "Small first actions beat overwhelming onboarding.",
+    "Family sharing needs counter-strategy against new threats."
   ],
   "items": [
     {
@@ -175,28 +175,19 @@
     }
   ],
   "decisions": [
-    "Used dark navy/teal color palette with amber accents",
-    "Structured slides to match interview format: problem \u2192 architecture \u2192 implementation \u2192 evaluation \u2192 impact",
-    "Added dedicated \"Failures, Tradeoffs & Lessons\" slide",
-    "Incorporated comparison tables, stat callouts, and version timeline",
-    "Ensured each slide had visual elements and consistent layouts",
-    "Ran the fetch script as specified",
-    "Script successfully discovered and downloaded new posts",
-    "Converted posts to markdown format",
-    "Saved to newsletters/yage-ai/ directory",
-    "Shape B as the main product with AI coach as a sidecar",
-    "Use forms for initial onboarding, not chat",
-    "Start users with a small first action before showing full plan"
+    "Shape B as main product, AI coach as sidecar",
+    "Protect intersection strategy over single features",
+    "Push direct to main over feature branch",
+    "Use forms over chat for initial onboarding",
+    "Scaffold Look & Learn language app prototype"
   ],
   "open_threads": [
-    "Need to write the actual PRD document",
-    "Need to conduct fresh competitive analysis for V2",
-    "Need to implement the plan schema and data migration",
-    "Should we prioritize adding family sharing to counter \u75db\u98ce\u5feb\u597d's potential threat?",
-    "How to maintain lifestyle tone while expanding food database?",
-    "What's the plan for monitoring competitor moves in the gout+habit space?",
-    "Swap StubVisionLabeler for real VLM (Claude Vision via anthropic SDK)",
-    "Test on real hardware via Meta AI registration flow",
-    "Add SRS scheduling and export-to-Anki button for retention/paywall hook"
-  ]
+    "Write PRD for AI goal coach",
+    "Swap StubVisionLabeler for real VLM",
+    "Test MetaGlass on real hardware",
+    "Add SRS scheduling for retention",
+    "Monitor gout+habit competitors"
+  ],
+  "decisions_extra": 19,
+  "open_extra": 4
 }

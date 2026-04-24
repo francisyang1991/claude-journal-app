@@ -304,6 +304,12 @@ function ObsidianReader({ day }) {
             <span>{s}</span>
           </div>
         ))}
+        {(day.decisions_extra || 0) > 0 && (
+          <div style={{ marginTop: 8, fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+            color: '#a89478', letterSpacing: 1 }}>
+            +{day.decisions_extra} more in sessions below
+          </div>
+        )}
 
         <div style={{ marginTop: 28, fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
           letterSpacing: 2, textTransform: 'uppercase', color: '#c26a4a', marginBottom: 12 }}>
@@ -322,6 +328,12 @@ function ObsidianReader({ day }) {
             <span>{s}</span>
           </div>
         ))}
+        {(day.open_extra || 0) > 0 && (
+          <div style={{ marginTop: 8, fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+            color: '#a89478', letterSpacing: 1 }}>
+            +{day.open_extra} more in sessions below
+          </div>
+        )}
 
         <div style={{ marginTop: 28, fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
           letterSpacing: 2, textTransform: 'uppercase', color: '#8c6a3d', marginBottom: 12,
