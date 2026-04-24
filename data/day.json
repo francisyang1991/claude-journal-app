@@ -10,9 +10,15 @@
   ],
   "sessions_total": 4,
   "sessions_kept": 3,
-  "honest": "\u2014",
-  "summary": "3 sessions across 2 topics.",
-  "lessons": [],
+  "honest": "Productive but mentally scattered.",
+  "summary": "Simplified app to focus on basic habit tracking, then synthesized a trading strategy from Brooks' transcripts. Dominant thread: reducing complexity.",
+  "lessons": [
+    "Simple habits beat complex AI for user retention.",
+    "Delegating research cuts analysis time significantly.",
+    "Mechanical strategies work better than ML for backtesting.",
+    "Focus on one problem at a time to avoid context switching.",
+    "Document synthesis reveals patterns faster than raw data."
+  ],
   "items": [
     {
       "topic": "tech",
@@ -98,18 +104,18 @@
     }
   ],
   "decisions": [
-    "Drop AI plan generation for complex goals",
-    "Focus on simple, repeatable habits",
-    "Remove multi-variant sampling and web search grounding",
-    "Prioritize low-friction user experience",
-    "Ran the fetch script as specified"
+    "Drop AI plan generation for simplicity",
+    "Focus on repeatable habits over complex goals",
+    "Synthesize trading strategy from transcripts",
+    "Choose mechanical over ML backtesting approach",
+    "Build breakout strategy as v1 approximation"
   ],
   "open_threads": [
-    "How to handle plan upload and calendar integration",
-    "Whether to keep any AI features for parsing simple habits",
-    "Native app requirement for iOS reminders",
-    "Refine stop placement to reduce oversized risk per trade",
-    "Implement MTR and pullback strategies after v1 validation"
+    "Refine stop placement to reduce risk",
+    "Implement MTR and pullback strategies",
+    "Optimize parameters via walk-forward analysis",
+    "Test multi-timeframe context integration",
+    "Decide on native app for iOS reminders"
   ],
   "decisions_extra": 8,
   "open_extra": 2

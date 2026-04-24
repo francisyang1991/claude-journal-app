@@ -204,11 +204,15 @@ def main() -> int:
     out_path.write_text(json.dumps(day, indent=2))
     print(f"[synthesize] wrote {out_path}", file=sys.stderr)
 
-    # Archive to data/history/ so thread builder has a stable multi-day source.
+    # Archive to data/history/ so thread builder + reader pager have a stable multi-day source.
     # data/day.json always reflects "most recent day processed"; history/ is append-only.
     hist_dir = DATA_DIR / "history"
     hist_dir.mkdir(parents=True, exist_ok=True)
     (hist_dir / f"{args.date}.json").write_text(json.dumps(day, indent=2))
+
+    # Manifest the reader uses to enumerate available dates without listing dir.
+    dates = sorted(p.stem for p in hist_dir.glob("*.json") if p.stem != "index")
+    (hist_dir / "index.json").write_text(json.dumps({"dates": dates}, indent=2))
 
     # Fold into the thread DB. Optional — threads are a layer on top; never fail synth.
     try:

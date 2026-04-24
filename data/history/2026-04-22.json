@@ -10,9 +10,15 @@
   ],
   "sessions_total": 6,
   "sessions_kept": 6,
-  "honest": "\u2014",
-  "summary": "6 sessions across 2 topics.",
-  "lessons": [],
+  "honest": "Felt like spinning plates\u2014some wobbled, none fell.",
+  "summary": "Doubled down on AI course materials while juggling engineering sprints and artifact prototypes. Detoured into document conversion for compatibility.",
+  "lessons": [
+    "Bilingual materials > English-only for global audiences",
+    "Mobile tap targets need explicit sizing validation",
+    "Custom docx styles beat built-in for consistency",
+    "Email triage needs clear prioritization rules",
+    "Architecture docs should include troubleshooting upfront"
+  ],
   "items": [
     {
       "topic": "ai",
@@ -167,18 +173,18 @@
   ],
   "filtered_out": [],
   "decisions": [
-    "Used bilingual Chinese/English with Chinese primary",
-    "Structured 5 modules covering agent fundamentals",
-    "Included code snippets and architecture descriptions",
-    "Focused on OpenAI Agents SDK for beginners",
-    "Ran the fetch script as specified"
+    "Prioritized Chinese-primary for AI course",
+    "Fixed mobile tap targets before reviews",
+    "Overrode docx heading styles for compatibility",
+    "Chose Gmail/Calendar for triage artifact",
+    "Used Ocean Gradient for interview slides"
   ],
   "open_threads": [
-    "Need to verify demo code functionality",
-    "Should add troubleshooting tips for common errors",
-    "May need to adjust timing based on student feedback",
-    "Design review feedback pending",
-    "Mobile tap target sizing confirmed"
+    "Verify demo code functionality",
+    "Resolve design review feedback",
+    "Finalize email triage filters",
+    "Add troubleshooting to AI materials",
+    "Adjust course timing based on feedback"
   ],
   "decisions_extra": 20,
   "open_extra": 4

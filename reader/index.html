@@ -660,9 +660,174 @@ function EditorialReader({ day }) {
   );
 }
 
+// Long-term memory view — every thread, grouped by state, expandable to show touches.
+function ThreadsView({ threads, history }) {
+  const all = (threads && threads.threads) || [];
+  const [expanded, setExpanded] = React.useState(() => new Set());
+  const toggle = (id) => {
+    const n = new Set(expanded);
+    n.has(id) ? n.delete(id) : n.add(id);
+    setExpanded(n);
+  };
+
+  const order = ['active', 'stale', 'resolved', 'deprioritized', 'abandoned'];
+  const grouped = React.useMemo(() => {
+    const out = {};
+    for (const t of all) (out[t.state] = out[t.state] || []).push(t);
+    for (const k of Object.keys(out)) {
+      out[k].sort((a, b) => (b.last_touched_on || '').localeCompare(a.last_touched_on || ''));
+    }
+    return out;
+  }, [all]);
+
+  const stateColors = {
+    active: '#6a8a5a', stale: '#c26a4a', resolved: '#8c7a5c',
+    deprioritized: '#a89478', abandoned: '#6a5a3a',
+  };
+
+  if (all.length === 0) {
+    return (
+      <div style={{ background: '#f3ece0', minHeight: 800, padding: '60px 80px',
+        borderRadius: 8, fontFamily: 'Lora, serif', color: '#3a3128' }}>
+        <h1 style={{ fontFamily: 'Lora, serif', fontSize: 36, fontStyle: 'italic',
+          margin: 0, fontWeight: 500 }}>No threads yet.</h1>
+        <p style={{ fontSize: 16, lineHeight: 1.7, color: '#6a5a3a', maxWidth: '60ch' }}>
+          Threads emerge when sessions log open items or decisions. Run the synthesis pipeline
+          on a few days of activity, then come back here.
+        </p>
+      </div>
+    );
+  }
+
+  const fmtDate = (iso) => iso ? new Date(iso + 'T00:00:00')
+    .toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—';
+  const daysSpan = history.length > 0
+    ? `${history.length} day${history.length === 1 ? '' : 's'}: ${fmtDate(history[0])} – ${fmtDate(history[history.length - 1])}`
+    : '';
+
+  return (
+    <div style={{ background: '#f3ece0', minHeight: 800, padding: '40px 64px',
+      borderRadius: 8, fontFamily: 'Lora, serif', color: '#2a2520',
+      boxShadow: '0 2px 24px rgba(60, 40, 10, 0.08)' }}>
+
+      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: 2,
+        color: '#8c7a5c', textTransform: 'uppercase', marginBottom: 8 }}>
+        Long-term memory
+      </div>
+      <h1 style={{ fontFamily: 'Lora, serif', fontSize: 38, fontStyle: 'italic', margin: 0,
+        fontWeight: 500, lineHeight: 1.1, letterSpacing: -0.5 }}>
+        Threads.
+      </h1>
+      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#8c7a5c',
+        marginTop: 8, letterSpacing: 1 }}>
+        {all.length} total · {daysSpan}
+      </div>
+
+      <div style={{ display: 'flex', gap: 16, marginTop: 18, flexWrap: 'wrap',
+        fontFamily: 'JetBrains Mono, monospace', fontSize: 11 }}>
+        {order.filter((s) => grouped[s]).map((s) => (
+          <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#6a5a3a' }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: stateColors[s] }} />
+            <span>{s}</span>
+            <span style={{ color: '#a89478' }}>{grouped[s].length}</span>
+          </div>
+        ))}
+      </div>
+
+      {order.filter((s) => grouped[s]).map((s) => (
+        <div key={s} style={{ marginTop: 36 }}>
+          <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: 2,
+            textTransform: 'uppercase', color: stateColors[s], marginBottom: 12,
+            display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: stateColors[s] }} />
+            <span>{s}</span>
+            <span style={{ color: '#a89478', letterSpacing: 0 }}>({grouped[s].length})</span>
+          </div>
+
+          {grouped[s].map((t) => {
+            const isExpanded = expanded.has(t.id);
+            return (
+              <article key={t.id} style={{ padding: '12px 0', borderBottom: '1px solid #e6dcc6' }}>
+                <div onClick={() => toggle(t.id)} style={{ cursor: 'pointer',
+                  display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 16, alignItems: 'baseline' }}>
+                  <span style={{ fontFamily: 'Lora, serif', fontSize: 17, lineHeight: 1.4,
+                    fontWeight: 500, textWrap: 'balance' }}>
+                    {t.title}
+                    {t.aliases?.length > 0 && (
+                      <span style={{ marginLeft: 10, fontFamily: 'JetBrains Mono, monospace',
+                        fontSize: 9, color: '#a89478', letterSpacing: 0.5 }}>
+                        +{t.aliases.length} alias{t.aliases.length === 1 ? '' : 'es'}
+                      </span>
+                    )}
+                  </span>
+                  <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
+                    color: '#8c7a5c', whiteSpace: 'nowrap' }}>
+                    {t.touches?.length || 0} touch{(t.touches?.length || 0) === 1 ? '' : 'es'}
+                  </span>
+                  <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
+                    color: '#8c7a5c' }}>
+                    last {fmtDate(t.last_touched_on)}
+                  </span>
+                </div>
+                {isExpanded && (
+                  <div style={{ marginTop: 12, paddingLeft: 0,
+                    fontSize: 14, color: '#3a3128', lineHeight: 1.6 }}>
+                    {t.aliases?.length > 0 && (
+                      <div style={{ marginBottom: 10 }}>
+                        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+                          letterSpacing: 1.5, color: '#8c7a5c', textTransform: 'uppercase',
+                          marginBottom: 4 }}>Aliases</div>
+                        {t.aliases.map((a, i) => (
+                          <div key={i} style={{ fontStyle: 'italic', color: '#6a5a3a' }}>— {a}</div>
+                        ))}
+                      </div>
+                    )}
+                    {t.cwd_signals?.length > 0 && (
+                      <div style={{ marginBottom: 10, fontFamily: 'JetBrains Mono, monospace',
+                        fontSize: 11, color: '#6a5a3a' }}>
+                        <span style={{ color: '#a89478', textTransform: 'uppercase',
+                          letterSpacing: 1.5, fontSize: 10, marginRight: 8 }}>cwd</span>
+                        {t.cwd_signals.join(' · ')}
+                      </div>
+                    )}
+                    {t.resolution && (
+                      <div style={{ marginBottom: 10, padding: '8px 12px',
+                        background: '#e6f0e0', borderLeft: '3px solid #6a8a5a',
+                        borderRadius: 2 }}>
+                        <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+                          color: '#6a8a5a', textTransform: 'uppercase', letterSpacing: 1.5,
+                          marginRight: 8 }}>resolved {fmtDate(t.resolution_date)}</span>
+                        {t.resolution}
+                      </div>
+                    )}
+                    <div>
+                      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+                        letterSpacing: 1.5, color: '#8c7a5c', textTransform: 'uppercase',
+                        marginBottom: 4 }}>History</div>
+                      {(t.touches || []).map((touch, i) => (
+                        <div key={i} style={{ fontFamily: 'JetBrains Mono, monospace',
+                          fontSize: 11, color: '#6a5a3a', padding: '2px 0' }}>
+                          {touch.date} · {touch.kind} · {touch.source || '?'}
+                          {touch.cwd && <span style={{ marginLeft: 8, color: '#a89478' }}>{touch.cwd}</span>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </article>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function App() {
   const [day, setDay] = React.useState(null);
   const [threads, setThreads] = React.useState(null);
+  const [history, setHistory] = React.useState([]);   // sorted list of available dates (asc)
+  const [activeDate, setActiveDate] = React.useState(null);
   const [err, setErr] = React.useState(null);
   const [view, setView] = React.useState(() => localStorage.getItem('journal_view') || 'obsidian');
 
@@ -670,17 +835,68 @@ function App() {
     localStorage.setItem('journal_view', view);
   }, [view]);
 
+  // Fetch the index of available history dates. Uses an optional manifest;
+  // if missing, falls back to scanning data/day.json + heuristic dates.
   React.useEffect(() => {
-    fetch('../data/day.json?ts=' + Date.now())
-      .then((r) => { if (!r.ok) throw new Error('no data/day.json — run ./build.sh first'); return r.json(); })
-      .then(setDay)
-      .catch((e) => setErr(e.message));
-    // Threads are optional — reader still works without memory/threads.json
     fetch('../memory/threads.json?ts=' + Date.now())
       .then((r) => r.ok ? r.json() : null)
       .then(setThreads)
       .catch(() => {});
+
+    // Try to discover history. We rely on a manifest file (data/history/index.json)
+    // for the canonical list of available dates — otherwise probe the latest day.
+    fetch('../data/history/index.json?ts=' + Date.now())
+      .then((r) => r.ok ? r.json() : null)
+      .then((manifest) => {
+        if (manifest && Array.isArray(manifest.dates) && manifest.dates.length > 0) {
+          const sorted = [...manifest.dates].sort();
+          setHistory(sorted);
+          setActiveDate(sorted[sorted.length - 1]);   // start at most-recent
+        } else {
+          // No manifest. Load just data/day.json and use its date as the only entry.
+          fetch('../data/day.json?ts=' + Date.now())
+            .then((r) => { if (!r.ok) throw new Error('no data/day.json — run ./build.sh first'); return r.json(); })
+            .then((d) => {
+              setHistory(d?.date ? [d.date] : []);
+              setActiveDate(d?.date || null);
+              setDay(d);
+            })
+            .catch((e) => setErr(e.message));
+        }
+      })
+      .catch(() => {
+        // index.json missing → fall through to bare day.json
+        fetch('../data/day.json?ts=' + Date.now())
+          .then((r) => { if (!r.ok) throw new Error('no data/day.json — run ./build.sh first'); return r.json(); })
+          .then((d) => {
+            setHistory(d?.date ? [d.date] : []);
+            setActiveDate(d?.date || null);
+            setDay(d);
+          })
+          .catch((e) => setErr(e.message));
+      });
   }, []);
+
+  // When activeDate changes (and we have a manifest), fetch that day's report.
+  React.useEffect(() => {
+    if (!activeDate || history.length === 0) return;
+    // Most-recent date may live in data/day.json; older dates in history/
+    const latest = history[history.length - 1];
+    const url = activeDate === latest
+      ? `../data/day.json?ts=${Date.now()}`
+      : `../data/history/${activeDate}.json?ts=${Date.now()}`;
+    fetch(url)
+      .then((r) => { if (!r.ok) throw new Error(`no report for ${activeDate}`); return r.json(); })
+      .then(setDay)
+      .catch((e) => setErr(e.message));
+  }, [activeDate, history]);
+
+  const idx = history.indexOf(activeDate);
+  const goPrev = () => idx > 0 && setActiveDate(history[idx - 1]);
+  const goNext = () => idx >= 0 && idx < history.length - 1 && setActiveDate(history[idx + 1]);
+  const goLatest = () => history.length > 0 && setActiveDate(history[history.length - 1]);
+  const isLatest = idx === history.length - 1;
+  const isOldest = idx === 0;
 
   if (err) return (
     <div className="empty">
@@ -690,17 +906,51 @@ function App() {
       </div>
     </div>
   );
-  if (!day) return <div className="empty">Loading…</div>;
+  if (!day && view !== 'threads') return <div className="empty">Loading…</div>;
+
+  const dateLabel = activeDate ? new Date(activeDate + 'T00:00:00').toLocaleDateString('en-US',
+    { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : '';
 
   return (
     <div className="page-wrap">
+      {/* Date pager */}
+      {view !== 'threads' && history.length > 0 && (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 12,
+          marginBottom: 12, fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
+          letterSpacing: 1.5, color: '#6a5a3a' }}>
+          <button onClick={goPrev} disabled={isOldest}
+            style={{ background: 'transparent', border: '1px solid #c8bfa6', color: isOldest ? '#c8bfa6' : '#4a3d2a',
+              padding: '6px 14px', borderRadius: 4, cursor: isOldest ? 'not-allowed' : 'pointer',
+              fontFamily: 'inherit', fontSize: 'inherit', letterSpacing: 'inherit' }}>← prev</button>
+          <div style={{ minWidth: 220, textAlign: 'center', textTransform: 'uppercase' }}>
+            {dateLabel}
+            <span style={{ marginLeft: 10, color: '#a89478', fontSize: 10 }}>
+              ({idx + 1} / {history.length})
+            </span>
+          </div>
+          <button onClick={goNext} disabled={isLatest}
+            style={{ background: 'transparent', border: '1px solid #c8bfa6', color: isLatest ? '#c8bfa6' : '#4a3d2a',
+              padding: '6px 14px', borderRadius: 4, cursor: isLatest ? 'not-allowed' : 'pointer',
+              fontFamily: 'inherit', fontSize: 'inherit', letterSpacing: 'inherit' }}>next →</button>
+          {!isLatest && (
+            <button onClick={goLatest}
+              style={{ background: '#1b1a17', border: 'none', color: '#f3ece0',
+                padding: '6px 14px', borderRadius: 4, cursor: 'pointer',
+                fontFamily: 'inherit', fontSize: 'inherit', letterSpacing: 'inherit' }}>today</button>
+          )}
+        </div>
+      )}
+
       <div className="view-toggle">
         <div className="seg">
           <button className={view === 'obsidian' ? 'active' : ''} onClick={() => setView('obsidian')}>C · Obsidian</button>
           <button className={view === 'editorial' ? 'active' : ''} onClick={() => setView('editorial')}>A · Editorial</button>
+          <button className={view === 'threads' ? 'active' : ''} onClick={() => setView('threads')}>Threads</button>
         </div>
       </div>
-      {view === 'editorial' ? <EditorialReader day={day} /> : <ObsidianReader day={day} threads={threads} />}
+      {view === 'threads' && <ThreadsView threads={threads} history={history} />}
+      {view === 'editorial' && <EditorialReader day={day} />}
+      {view === 'obsidian' && <ObsidianReader day={day} threads={threads} />}
     </div>
   );
 }
