@@ -15,9 +15,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import llm
+import os as _os
 
-ROOT = Path(__file__).resolve().parent.parent
-RAW_DIR = ROOT / "raw"
+APP_ROOT = Path(__file__).resolve().parent.parent
+DATA_DIR = Path(_os.environ.get("CLAUDE_JOURNAL_DATA_DIR") or APP_ROOT).resolve()
+RAW_DIR = DATA_DIR / "raw"
 
 PROMPT = """You are extracting structured notes from a {source} session from {date}.
 Session title: {title}

@@ -1,6 +1,6 @@
 # ADR-001: Storage + multi-tenancy architecture
 
-**Status:** Proposed — revised 2026-04-24 to add shared vault
+**Status:** Accepted (2026-04-24) — three-repo model with shared vault, app repo public, vault name `household-vault`
 **Date:** 2026-04-24
 **Deciders:** Francis (sole maintainer today; Yuwen as prospective second user using Cursor)
 
@@ -30,7 +30,7 @@ Two constraints now force a revisit:
 
 Each user has up to three git checkouts on each of their devices:
 
-- **`claude-journal-app/`** — shared code. Same for every user. Contains scripts, source adapters, reader, workflow templates. Updated via `git pull`. Public or semi-public.
+- **`claude-journal-app/`** — shared code. Same for every user. Contains scripts, source adapters, reader, workflow templates. Updated via `git pull`. **Public** (invites contributors; reveals nothing about user content).
 - **`<user>-journal-data/`** — private memory. One per user. Raw sessions, per-day digests, thread state, AI reflections. Contents of what the person did with their AI tools. Never shared.
 - **`<shared-vault>/`** *(optional)* — authored content shared between users (e.g., Francis + Yuwen). Skills, plans, shared knowledge. Distinct from any user's private memory. Can be read-write by a small, explicit set of GitHub collaborators.
 
@@ -143,7 +143,7 @@ yuwen-journal-data/              ← Yuwen's private data (Cursor on her laptop)
 ├── data/
 └── memory/
 
-shared-vault/                    ← shared authored content (Francis + Yuwen)
+household-vault/                    ← shared authored content (Francis + Yuwen)
 ├── skills/                      ← reusable knowledge
 │   ├── award-booking.md
 │   └── interview-prep-playbook.md
@@ -163,7 +163,7 @@ Every script takes `CLAUDE_JOURNAL_DATA_DIR` from env (or a `--data-dir` flag) f
 - Authored content both users want to reference — skills, plans, knowledge bases
 - Read-write by both users (they're collaborators on the repo)
 - Manually curated (no auto-routing from private memory in v1)
-- Can be referenced from either user's private synthesis pipeline (e.g., "add context from `shared-vault/plans/2026-taipei-trip.md` when synthesizing a travel topic session")
+- Can be referenced from either user's private synthesis pipeline (e.g., "add context from `household-vault/plans/2026-taipei-trip.md` when synthesizing a travel topic session")
 
 **Out of scope for v1:**
 - Auto-promoting sessions from private to shared (privacy risk, user-agency risk)

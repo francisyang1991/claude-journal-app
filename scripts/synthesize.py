@@ -19,8 +19,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import llm
+import os as _os
 
-ROOT = Path(__file__).resolve().parent.parent
+APP_ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(_os.environ.get("CLAUDE_JOURNAL_DATA_DIR") or APP_ROOT).resolve()
 RAW_DIR = ROOT / "raw"
 DATA_DIR = ROOT / "data"
 

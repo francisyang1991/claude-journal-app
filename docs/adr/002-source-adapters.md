@@ -175,12 +175,89 @@ The alternative — keeping `collect.py` monolithic — breaks the moment a thir
 - **Cross-source deduplication.** If a session appears in both Cowork and Claude Code (unlikely but possible), we'd need to dedupe. Deferred until observed.
 - **Incremental collection.** Today adapters scan the entire date window every run. For high-volume users, add a state file tracking last-collected timestamps per adapter.
 
-## Open questions
+## Cursor schema — confirmed by inspection
 
-1. **Cursor SQLite schema.** Exact keys in `ItemTable` where chat history lives need confirmation. Starting points: community tools like `cursor-chat-export` (GitHub) document the schema. Research before implementing.
-2. **Cursor multi-workspace.** Each workspace has its own `state.vscdb`. The adapter must iterate all workspaces, not just the current one.
-3. **Cursor privacy.** Cursor's Pro plan has a "privacy mode" that routes chats through their servers without local persistence. In that mode, this adapter sees nothing — need to document the limitation.
-4. **Where do we cut off "tool X is in scope"?** IntelliJ AI Assistant, Copilot chat, Zed — each is a candidate. Principle: add adapters only when a real user of this system needs them. Not speculative.
+Research done 2026-04-24 against a live Cursor install. The `cursor-chat-export` tool docs the *old* `ItemTable` key path (`workbench.panel.aichat.view.aichat.chatdata`), which is **deprecated**. Current Cursor (2025–2026) uses the Composer architecture with a different storage table.
+
+### Location
+
+```
+~/Library/Application Support/Cursor/User/globalStorage/state.vscdb   # macOS
+~/.config/Cursor/User/globalStorage/state.vscdb                        # Linux
+%APPDATA%/Cursor/User/globalStorage/state.vscdb                        # Windows
+```
+
+Single global SQLite DB per Cursor install. Not per-workspace.
+
+### Tables
+
+- `ItemTable` — small KV pairs (deprecated-style chat data, some config)
+- `cursorDiskKV` — the main store. All composer/message data lives here.
+
+### Key prefixes in `cursorDiskKV`
+
+| Prefix | Purpose | Count (sample) |
+|---|---|---|
+| `composerData:{composerId}` | one row per conversation; metadata + bubble order | 178 |
+| `bubbleId:{composerId}:{bubbleId}` | one row per message | 42,798 |
+| `messageRequestContext:{...}` | per-message request context (rarely needed) | 975 |
+| `checkpointId:{...}` | file checkpoint snapshots | 7,776 |
+| `codeBlockDiff:{...}` | code edit diffs | 3,783 |
+| `agentKv:blob:{...}` | agent tool-call outputs | 50,883 |
+
+### Composer shape
+
+```json
+{
+  "_v": 3,
+  "composerId": "cf30e0cd-...",
+  "name": "<optional title>",
+  "createdAt": 1759867821881,        // unix ms
+  "lastUpdatedAt": 1759900000000,    // unix ms (present on active composers)
+  "fullConversationHeadersOnly": [
+    { "bubbleId": "feafd5ef-...", "type": 1 },   // type 1 = user
+    { "bubbleId": "9f6041f8-...", "type": 2 },   // type 2 = assistant
+    ...
+  ],
+  "richText": "<lexical JSON>",
+  "status": "none",
+  "unifiedMode": "chat"
+}
+```
+
+### Bubble (message) shape
+
+Both types (user and assistant) expose plaintext via `text`:
+
+```json
+{
+  "_v": 3,
+  "type": 1,                          // 1 = user, 2 = assistant
+  "bubbleId": "feafd5ef-...",
+  "text": "plain-text message content",
+  "richText": "<lexical JSON>",       // user bubbles only
+  "tokenCount": 1234,
+  ...many attachment/context fields (ignored)
+}
+```
+
+No per-bubble timestamp. Ordering is authoritative via `fullConversationHeadersOnly`.
+
+### Workspace ↔ composer linkage (best effort)
+
+Each workspace has a local DB at `workspaceStorage/{hash}/state.vscdb` containing an `ItemTable` entry at key `composer.composerData` with the list of composerIds used in that workspace. Combined with `workspaceStorage/{hash}/workspace.json` (folder URI), we can map composer → cwd.
+
+For MVP, we record composer `cwd` as best-effort — if the lookup fails, leave blank.
+
+### Cursor "privacy mode" caveat
+
+Cursor Pro's privacy mode disables local chat persistence. In that mode, `cursorDiskKV` is not populated. Adapter must handle empty-DB gracefully and document this limitation in the setup guide for users considering this system.
+
+## Remaining open questions
+
+1. **Cursor composer → cwd mapping.** Iterating all `workspaceStorage/*/state.vscdb` files to build a composerId-to-cwd map is ~100–500 workspaces × one SQLite open per workspace. Acceptable performance at this scale, but cache the map per-run.
+2. **Where do we cut off "tool X is in scope"?** IntelliJ AI Assistant, Copilot chat, Zed — each is a candidate. Principle: add adapters only when a real user of this system needs them. Not speculative.
+3. **Schema versioning.** Cursor has already changed chat storage once (ItemTable → cursorDiskKV). Expect another migration. The adapter should probe both key shapes and pick whichever has data.
 
 ## Action items
 
