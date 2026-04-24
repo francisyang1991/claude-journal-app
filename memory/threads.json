@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-04-24T19:53:27.185724+00:00",
+  "updated_at": "2026-04-24T20:03:20.883416+00:00",
   "threads": [
     {
       "id": "th_cfbc43b08d",
@@ -12,13 +12,15 @@
       "touches": [
         {
           "date": "2026-04-22",
-          "session_id": "unknown",
-          "cwd": null,
+          "session_id": "local_b8a7aec2-4f06-46e5-85fe-4dd632d82e33",
+          "cwd": "/sessions/elegant-sweet-cerf",
           "source": "cowork",
           "kind": "open"
         }
       ],
-      "cwd_signals": [],
+      "cwd_signals": [
+        "/sessions/elegant-sweet-cerf"
+      ],
       "resolution": null,
       "resolution_date": null,
       "aliases": []
@@ -34,13 +36,15 @@
       "touches": [
         {
           "date": "2026-04-22",
-          "session_id": "unknown",
-          "cwd": null,
+          "session_id": "local_b8a7aec2-4f06-46e5-85fe-4dd632d82e33",
+          "cwd": "/sessions/elegant-sweet-cerf",
           "source": "cowork",
           "kind": "open"
         }
       ],
-      "cwd_signals": [],
+      "cwd_signals": [
+        "/sessions/elegant-sweet-cerf"
+      ],
       "resolution": null,
       "resolution_date": null,
       "aliases": []
@@ -56,13 +60,15 @@
       "touches": [
         {
           "date": "2026-04-22",
-          "session_id": "unknown",
-          "cwd": null,
+          "session_id": "local_b8a7aec2-4f06-46e5-85fe-4dd632d82e33",
+          "cwd": "/sessions/elegant-sweet-cerf",
           "source": "cowork",
           "kind": "open"
         }
       ],
-      "cwd_signals": [],
+      "cwd_signals": [
+        "/sessions/elegant-sweet-cerf"
+      ],
       "resolution": null,
       "resolution_date": null,
       "aliases": []
@@ -78,13 +84,15 @@
       "touches": [
         {
           "date": "2026-04-22",
-          "session_id": "unknown",
-          "cwd": null,
+          "session_id": "0ccb0f44-f9ae-4c55-bdad-62b800e07a3e",
+          "cwd": "/Users/francisyang/VibeCodingProjects/cadence",
           "source": "claude-code",
           "kind": "open"
         }
       ],
-      "cwd_signals": [],
+      "cwd_signals": [
+        "/Users/francisyang/VibeCodingProjects/cadence"
+      ],
       "resolution": null,
       "resolution_date": null,
       "aliases": []
@@ -100,13 +108,15 @@
       "touches": [
         {
           "date": "2026-04-22",
-          "session_id": "unknown",
-          "cwd": null,
+          "session_id": "0ccb0f44-f9ae-4c55-bdad-62b800e07a3e",
+          "cwd": "/Users/francisyang/VibeCodingProjects/cadence",
           "source": "claude-code",
           "kind": "open"
         }
       ],
-      "cwd_signals": [],
+      "cwd_signals": [
+        "/Users/francisyang/VibeCodingProjects/cadence"
+      ],
       "resolution": null,
       "resolution_date": null,
       "aliases": []
@@ -122,13 +132,15 @@
       "touches": [
         {
           "date": "2026-04-22",
-          "session_id": "unknown",
-          "cwd": null,
+          "session_id": "0ccb0f44-f9ae-4c55-bdad-62b800e07a3e",
+          "cwd": "/Users/francisyang/VibeCodingProjects/cadence",
           "source": "claude-code",
           "kind": "open"
         }
       ],
-      "cwd_signals": [],
+      "cwd_signals": [
+        "/Users/francisyang/VibeCodingProjects/cadence"
+      ],
       "resolution": null,
       "resolution_date": null,
       "aliases": []
@@ -144,13 +156,15 @@
       "touches": [
         {
           "date": "2026-04-22",
-          "session_id": "unknown",
-          "cwd": null,
+          "session_id": "local_bc3c24d1-6644-4222-a386-852394a96619",
+          "cwd": "/sessions/pensive-nifty-faraday",
           "source": "cowork",
           "kind": "open"
         }
       ],
-      "cwd_signals": [],
+      "cwd_signals": [
+        "/sessions/pensive-nifty-faraday"
+      ],
       "resolution": null,
       "resolution_date": null,
       "aliases": []
@@ -166,13 +180,15 @@
       "touches": [
         {
           "date": "2026-04-22",
-          "session_id": "unknown",
-          "cwd": null,
+          "session_id": "local_bc3c24d1-6644-4222-a386-852394a96619",
+          "cwd": "/sessions/pensive-nifty-faraday",
           "source": "cowork",
           "kind": "open"
         }
       ],
-      "cwd_signals": [],
+      "cwd_signals": [
+        "/sessions/pensive-nifty-faraday"
+      ],
       "resolution": null,
       "resolution_date": null,
       "aliases": []
@@ -188,13 +204,15 @@
       "touches": [
         {
           "date": "2026-04-22",
-          "session_id": "unknown",
-          "cwd": null,
+          "session_id": "local_bc3c24d1-6644-4222-a386-852394a96619",
+          "cwd": "/sessions/pensive-nifty-faraday",
           "source": "cowork",
           "kind": "open"
         }
       ],
-      "cwd_signals": [],
+      "cwd_signals": [
+        "/sessions/pensive-nifty-faraday"
+      ],
       "resolution": null,
       "resolution_date": null,
       "aliases": []
@@ -210,13 +228,15 @@
       "touches": [
         {
           "date": "2026-04-23",
-          "session_id": "unknown",
-          "cwd": null,
+          "session_id": "0ccb0f44-f9ae-4c55-bdad-62b800e07a3e",
+          "cwd": "/Users/francisyang/VibeCodingProjects/cadence",
           "source": "claude-code",
           "kind": "open"
         }
       ],
-      "cwd_signals": [],
+      "cwd_signals": [
+        "/Users/francisyang/VibeCodingProjects/cadence"
+      ],
       "resolution": null,
       "resolution_date": null,
       "aliases": []
@@ -232,13 +252,15 @@
       "touches": [
         {
           "date": "2026-04-23",
-          "session_id": "unknown",
-          "cwd": null,
+          "session_id": "0ccb0f44-f9ae-4c55-bdad-62b800e07a3e",
+          "cwd": "/Users/francisyang/VibeCodingProjects/cadence",
           "source": "claude-code",
           "kind": "open"
         }
       ],
-      "cwd_signals": [],
+      "cwd_signals": [
+        "/Users/francisyang/VibeCodingProjects/cadence"
+      ],
       "resolution": null,
       "resolution_date": null,
       "aliases": []
@@ -254,13 +276,15 @@
       "touches": [
         {
           "date": "2026-04-23",
-          "session_id": "unknown",
-          "cwd": null,
+          "session_id": "0ccb0f44-f9ae-4c55-bdad-62b800e07a3e",
+          "cwd": "/Users/francisyang/VibeCodingProjects/cadence",
           "source": "claude-code",
           "kind": "open"
         }
       ],
-      "cwd_signals": [],
+      "cwd_signals": [
+        "/Users/francisyang/VibeCodingProjects/cadence"
+      ],
       "resolution": null,
       "resolution_date": null,
       "aliases": []
@@ -276,13 +300,15 @@
       "touches": [
         {
           "date": "2026-04-24",
-          "session_id": "unknown",
-          "cwd": null,
+          "session_id": "0ccb0f44-f9ae-4c55-bdad-62b800e07a3e",
+          "cwd": "/Users/francisyang/VibeCodingProjects/cadence",
           "source": "claude-code",
           "kind": "open"
         }
       ],
-      "cwd_signals": [],
+      "cwd_signals": [
+        "/Users/francisyang/VibeCodingProjects/cadence"
+      ],
       "resolution": null,
       "resolution_date": null,
       "aliases": []
@@ -298,13 +324,15 @@
       "touches": [
         {
           "date": "2026-04-24",
-          "session_id": "unknown",
-          "cwd": null,
+          "session_id": "0ccb0f44-f9ae-4c55-bdad-62b800e07a3e",
+          "cwd": "/Users/francisyang/VibeCodingProjects/cadence",
           "source": "claude-code",
           "kind": "open"
         }
       ],
-      "cwd_signals": [],
+      "cwd_signals": [
+        "/Users/francisyang/VibeCodingProjects/cadence"
+      ],
       "resolution": null,
       "resolution_date": null,
       "aliases": []
@@ -320,13 +348,15 @@
       "touches": [
         {
           "date": "2026-04-24",
-          "session_id": "unknown",
-          "cwd": null,
+          "session_id": "0ccb0f44-f9ae-4c55-bdad-62b800e07a3e",
+          "cwd": "/Users/francisyang/VibeCodingProjects/cadence",
           "source": "claude-code",
           "kind": "open"
         }
       ],
-      "cwd_signals": [],
+      "cwd_signals": [
+        "/Users/francisyang/VibeCodingProjects/cadence"
+      ],
       "resolution": null,
       "resolution_date": null,
       "aliases": []
@@ -342,13 +372,15 @@
       "touches": [
         {
           "date": "2026-04-24",
-          "session_id": "unknown",
-          "cwd": null,
+          "session_id": "9f3feb3c-2aa4-41b1-9313-5c13e3e131bb",
+          "cwd": "/Users/francisyang/Documents/course",
           "source": "claude-code",
           "kind": "open"
         }
       ],
-      "cwd_signals": [],
+      "cwd_signals": [
+        "/Users/francisyang/Documents/course"
+      ],
       "resolution": null,
       "resolution_date": null,
       "aliases": []
@@ -364,13 +396,15 @@
       "touches": [
         {
           "date": "2026-04-24",
-          "session_id": "unknown",
-          "cwd": null,
+          "session_id": "9f3feb3c-2aa4-41b1-9313-5c13e3e131bb",
+          "cwd": "/Users/francisyang/Documents/course",
           "source": "claude-code",
           "kind": "open"
         }
       ],
-      "cwd_signals": [],
+      "cwd_signals": [
+        "/Users/francisyang/Documents/course"
+      ],
       "resolution": null,
       "resolution_date": null,
       "aliases": []
@@ -386,13 +420,15 @@
       "touches": [
         {
           "date": "2026-04-24",
-          "session_id": "unknown",
-          "cwd": null,
+          "session_id": "9f3feb3c-2aa4-41b1-9313-5c13e3e131bb",
+          "cwd": "/Users/francisyang/Documents/course",
           "source": "claude-code",
           "kind": "open"
         }
       ],
-      "cwd_signals": [],
+      "cwd_signals": [
+        "/Users/francisyang/Documents/course"
+      ],
       "resolution": null,
       "resolution_date": null,
       "aliases": []
@@ -408,13 +444,15 @@
       "touches": [
         {
           "date": "2026-04-24",
-          "session_id": "unknown",
-          "cwd": null,
+          "session_id": "9f3feb3c-2aa4-41b1-9313-5c13e3e131bb",
+          "cwd": "/Users/francisyang/Documents/course",
           "source": "claude-code",
           "kind": "open"
         }
       ],
-      "cwd_signals": [],
+      "cwd_signals": [
+        "/Users/francisyang/Documents/course"
+      ],
       "resolution": null,
       "resolution_date": null,
       "aliases": []

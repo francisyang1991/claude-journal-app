@@ -24,6 +24,24 @@ APP_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = Path(os.environ.get("CLAUDE_JOURNAL_DATA_DIR") or APP_ROOT).resolve()
 
 
+def try_embed_with_fastembed(texts: list[str]) -> dict[str, list[float]] | None:
+    """Opt-in: if fastembed is installed, embed texts with a small local model.
+    Returns None if fastembed isn't available (no extra deps required)."""
+    try:
+        from fastembed import TextEmbedding  # type: ignore
+    except ImportError:
+        return None
+    if not texts:
+        return {}
+    model_name = os.environ.get("FASTEMBED_MODEL", "BAAI/bge-small-en-v1.5")
+    model = TextEmbedding(model_name=model_name)
+    out: dict[str, list[float]] = {}
+    # fastembed returns an iterator of np arrays
+    for text, vec in zip(texts, model.embed(texts)):
+        out[text] = list(map(float, vec))
+    return out
+
+
 def load_day(path: Path) -> dict | None:
     try:
         return json.loads(path.read_text())
@@ -75,6 +93,29 @@ def main() -> int:
     if not day_files:
         print("[threads] no day reports found; nothing to do", file=sys.stderr)
         return 0
+
+    # Pre-populate embedding cache if available (opt-in via fastembed).
+    emb_path = DATA_DIR / "memory" / "embeddings.json"
+    T.load_embeddings(emb_path)
+
+    # Collect every text we'll match on this run so we can embed them all at once.
+    texts_to_embed: set[str] = set()
+    for p in day_files:
+        day = load_day(p)
+        if not day:
+            continue
+        for it in day.get("items") or []:
+            for s in (it.get("open") or []) + (it.get("decisions") or []):
+                if s and s not in T.EMBEDDINGS:
+                    texts_to_embed.add(s)
+
+    if texts_to_embed:
+        new = try_embed_with_fastembed(sorted(texts_to_embed))
+        if new:
+            T.EMBEDDINGS.update(new)
+            emb_path.parent.mkdir(parents=True, exist_ok=True)
+            emb_path.write_text(json.dumps(T.EMBEDDINGS, indent=2))
+            print(f"[threads] embedded {len(new)} new texts (fastembed)", file=sys.stderr)
 
     threads: list[T.Thread] = []
     for p in day_files:

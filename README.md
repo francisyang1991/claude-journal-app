@@ -137,6 +137,43 @@ python3 -m http.server 8000
 
 Useful when iterating on prompts or topic keywords.
 
+## Thread tracking + coach (optional)
+
+Each synthesis run builds `memory/threads.json` — a cross-day view of persistent decisions and open items with a state machine (`active` → `stale` at 7d → `abandoned` at 30d, or `resolved` when a later decision closes an earlier open).
+
+### Coach at session start
+
+Install the Claude Code hook to get a "carry over" preamble in every new session:
+
+```bash
+./scripts/install-hook.sh             # installs to ~/.claude/settings.json
+./scripts/install-hook.sh --project   # installs to ./.claude/settings.json
+./scripts/install-hook.sh --print     # print the JSON snippet, don't install
+```
+
+When you open Claude Code in a repo with live threads, you'll see:
+
+```
+── Coach (claude-journal) · cadence · last journal entry: today ──
+Open threads in this repo:
+  ● How to handle plan upload and calendar integration
+       last touched today · active
+Coach asks:
+  → Heads up: *How to handle plan upload and calendar integration* — still want to close this today?
+```
+
+Coach is fast (local files only, no LLM, ~50ms), silent when there's nothing to show, and never blocks your session if something goes wrong.
+
+### Optional: better matching with embeddings
+
+Thread linking uses a hybrid word + character n-gram Jaccard matcher by default (stdlib only, catches paraphrases like "competitive analysis" ↔ "competitor analysis"). For true semantic matching across unrelated vocabulary — install `fastembed`:
+
+```bash
+pip install fastembed
+```
+
+On the next `./build.sh` or synthesis run, thread matching will automatically use `BAAI/bge-small-en-v1.5` (~130MB one-time model download, runs locally, no API key needed). Override model with `FASTEMBED_MODEL=...`.
+
 ## File layout
 
 ```

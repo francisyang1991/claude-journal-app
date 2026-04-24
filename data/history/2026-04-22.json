@@ -10,15 +10,9 @@
   ],
   "sessions_total": 6,
   "sessions_kept": 6,
-  "honest": "Productive but scattered. Too many threads at once.",
-  "summary": "Built AI course materials and technical interview slides while juggling engineering tasks. Got sidetracked by email triage dashboard prototype.",
-  "lessons": [
-    "Bilingual materials work better than English-only for mixed audiences.",
-    "Ocean Gradient palette makes technical slides pop without distraction.",
-    "Mobile tap targets need explicit sizing \u2014 don't assume defaults.",
-    "Persistent artifacts beat one-off tools for daily workflows.",
-    "PDF to Word conversion requires style overrides for consistency."
-  ],
+  "honest": "\u2014",
+  "summary": "6 sessions across 2 topics.",
+  "lessons": [],
   "items": [
     {
       "topic": "ai",
@@ -43,7 +37,9 @@
         "modified: /sessions/elegant-sweet-cerf/mnt/.skills/skills/pdf/PDF Processing Guide",
         "added: /sessions/elegant-sweet-cerf/mnt/SeeUEducation/Day1_Agent\u5165\u95e8/Day1_\u8bb2\u4e49_Agent\u5165\u95e8.md"
       ],
-      "sensitive": false
+      "sensitive": false,
+      "cwd": "/sessions/elegant-sweet-cerf",
+      "session_id": "local_b8a7aec2-4f06-46e5-85fe-4dd632d82e33"
     },
     {
       "topic": "ai",
@@ -62,7 +58,9 @@
       "artifacts": [
         "added: /sessions/trusting-busy-pascal/mnt/agent_sop/newsletters/yage-ai/yage-ai-ai-2026-04-21.md"
       ],
-      "sensitive": false
+      "sensitive": false,
+      "cwd": "/sessions/trusting-busy-pascal",
+      "session_id": "local_be081a55-5628-4995-ad52-714220a50964"
     },
     {
       "topic": "ai",
@@ -85,7 +83,9 @@
         "added: docs/demo/demo-slides.pptx",
         "added: docs/demo/demo-discussion.md"
       ],
-      "sensitive": false
+      "sensitive": false,
+      "cwd": "/Users/francisyang/VibeCodingProjects/ambienceHealthcare",
+      "session_id": "8a563955-0659-4e33-b16b-46faf56ed606"
     },
     {
       "topic": "tech",
@@ -111,7 +111,9 @@
         "modified: components/habits/habit-row.tsx",
         "modified: app/(app)/today/page.tsx"
       ],
-      "sensitive": false
+      "sensitive": false,
+      "cwd": "/Users/francisyang/VibeCodingProjects/cadence",
+      "session_id": "0ccb0f44-f9ae-4c55-bdad-62b800e07a3e"
     },
     {
       "topic": "tech",
@@ -135,7 +137,9 @@
       "artifacts": [
         "None"
       ],
-      "sensitive": false
+      "sensitive": false,
+      "cwd": "/sessions/pensive-nifty-faraday",
+      "session_id": "local_bc3c24d1-6644-4222-a386-852394a96619"
     },
     {
       "topic": "ai",
@@ -156,23 +160,25 @@
       "artifacts": [
         "added: /sessions/loving-busy-volta/mnt/.claude/skills/docx/AI_Agent\u8bfe\u7a0b_\u6559\u5b66\u8ba1\u5212_\u6700\u7ec8\u7248.docx"
       ],
-      "sensitive": false
+      "sensitive": false,
+      "cwd": "/sessions/loving-busy-volta",
+      "session_id": "local_fd646476-d638-460a-9117-20728fece9c3"
     }
   ],
   "filtered_out": [],
   "decisions": [
-    "Prioritized bilingual AI course materials",
-    "Structured interview slides around discussion flow",
-    "Bumped mobile button height for accessibility",
-    "Chose Gmail/Calendar integration for email triage",
-    "Overrode Word heading styles for clean output"
+    "Used bilingual Chinese/English with Chinese primary",
+    "Structured 5 modules covering agent fundamentals",
+    "Included code snippets and architecture descriptions",
+    "Focused on OpenAI Agents SDK for beginners",
+    "Ran the fetch script as specified"
   ],
   "open_threads": [
-    "Verify AI demo code functionality",
-    "Resolve design review feedback",
-    "Define Gmail filters for triage",
-    "Prioritize email display strategy",
-    "Adjust course timing based on feedback"
+    "Need to verify demo code functionality",
+    "Should add troubleshooting tips for common errors",
+    "May need to adjust timing based on student feedback",
+    "Design review feedback pending",
+    "Mobile tap target sizing confirmed"
   ],
   "decisions_extra": 20,
   "open_extra": 4

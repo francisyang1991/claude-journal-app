@@ -38,8 +38,16 @@ STATE_DEPRIORITIZED = "deprioritized"
 STALE_AFTER_DAYS = 7
 ABANDON_AFTER_STALE_DAYS = 30
 
-# Matching threshold (Jaccard)
-SIMILARITY_MATCH = 0.55
+# Matching threshold — applied to max(word_jaccard, char_ngram_jaccard, [cosine]).
+# Tuned so paraphrases ("competitive analysis" ↔ "competitor analysis") match
+# while truly unrelated items stay separate. Cosine (if available) will dominate
+# on semantic matches that share no words or stems.
+SIMILARITY_MATCH = 0.35
+CHAR_NGRAM_SIZE = 4
+
+# Optional embedding backend. If EMBEDDINGS is populated (text → list[float]),
+# cosine similarity is used as a third signal. See build_threads.py.
+EMBEDDINGS: dict[str, list[float]] = {}
 
 
 # ── data model ─────────────────────────────────────────────────────────────
@@ -79,18 +87,50 @@ _STOPWORDS = {
 
 
 def _tokens(text: str) -> set[str]:
+    """Stopword-filtered word tokens for word-level Jaccard."""
     words = re.findall(r"\w{3,}", text.lower())
     return {w for w in words if w not in _STOPWORDS}
 
 
-def similarity(a: str, b: str) -> float:
-    """Jaccard on normalized token sets. 0.0 to 1.0."""
-    ta, tb = _tokens(a), _tokens(b)
-    if not ta or not tb:
+def _char_ngrams(text: str, n: int = CHAR_NGRAM_SIZE) -> set[str]:
+    """Character n-grams over a normalized form. Catches paraphrases
+    like 'competitive analysis' ↔ 'competitor analysis' that share
+    stems but not full words."""
+    s = re.sub(r"\s+", " ", text.lower().strip())
+    s = re.sub(r"[^\w\s]", "", s)
+    if len(s) < n:
+        return {s}
+    return {s[i:i + n] for i in range(len(s) - n + 1)}
+
+
+def _cosine(a: list[float], b: list[float]) -> float:
+    dot = sum(x * y for x, y in zip(a, b))
+    na = sum(x * x for x in a) ** 0.5
+    nb = sum(x * x for x in b) ** 0.5
+    if na == 0 or nb == 0:
         return 0.0
-    inter = ta & tb
-    union = ta | tb
-    return len(inter) / len(union)
+    return dot / (na * nb)
+
+
+def _jaccard(a: set, b: set) -> float:
+    if not a or not b:
+        return 0.0
+    return len(a & b) / len(a | b)
+
+
+def similarity(a: str, b: str) -> float:
+    """Hybrid similarity. Returns max of:
+      - word-level Jaccard (stopword-aware)
+      - character n-gram Jaccard (paraphrase / stem tolerance)
+      - cosine over EMBEDDINGS if both texts are cached
+    """
+    word_sim = _jaccard(_tokens(a), _tokens(b))
+    char_sim = _jaccard(_char_ngrams(a), _char_ngrams(b))
+    scores = [word_sim, char_sim]
+    va, vb = EMBEDDINGS.get(a), EMBEDDINGS.get(b)
+    if va and vb:
+        scores.append(_cosine(va, vb))
+    return max(scores)
 
 
 def thread_id_for(title: str) -> str:
@@ -237,6 +277,21 @@ def load(path: Path) -> list[Thread]:
 def save(path: Path, threads: list[Thread]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(to_dict(threads), indent=2))
+
+
+def load_embeddings(path: Path) -> dict[str, list[float]]:
+    """Load optional embedding cache. Populates module-level EMBEDDINGS."""
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text())
+    except Exception:
+        return {}
+    if isinstance(data, dict):
+        EMBEDDINGS.clear()
+        EMBEDDINGS.update(data)
+        return data
+    return {}
 
 
 # ── helpers for coach.py + reader ──────────────────────────────────────────

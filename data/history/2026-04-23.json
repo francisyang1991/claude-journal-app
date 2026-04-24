@@ -10,15 +10,9 @@
   ],
   "sessions_total": 8,
   "sessions_kept": 4,
-  "honest": "Felt scattered but productive across design, code, and prep.",
-  "summary": "Prepped for a tech interview while iterating on AI product design. Pushed code directly to main instead of branching.",
-  "lessons": [
-    "Dedicated failure slides build interview credibility.",
-    "Sidecar UIs keep core products uncluttered.",
-    "Small first actions beat complex onboarding.",
-    "Pushing directly to main saves time but skips review.",
-    "Seed plans must generalize beyond niche use cases."
-  ],
+  "honest": "\u2014",
+  "summary": "4 sessions across 3 topics.",
+  "lessons": [],
   "items": [
     {
       "topic": "tech",
@@ -39,7 +33,9 @@
       "artifacts": [
         "modified: /sessions/charming-youthful-wright/mnt/agent_sop/IDG_Revamp_Deep_Dive.pptx"
       ],
-      "sensitive": false
+      "sensitive": false,
+      "cwd": "/sessions/charming-youthful-wright",
+      "session_id": "local_6d1d61af-9499-44e2-b78f-5795f974a6bd"
     },
     {
       "topic": "ai",
@@ -59,7 +55,9 @@
       "artifacts": [
         "added: /newsletters/yage-ai/yage-ai-ai-2026-04-22.md"
       ],
-      "sensitive": false
+      "sensitive": false,
+      "cwd": "/sessions/keen-tender-hamilton",
+      "session_id": "local_95accffa-6c72-4409-8069-1407b3a8b954"
     },
     {
       "topic": "health",
@@ -86,7 +84,9 @@
         "added: seed-plan-generalized.md",
         "deleted: None"
       ],
-      "sensitive": false
+      "sensitive": false,
+      "cwd": "/Users/francisyang/VibeCodingProjects/cadence",
+      "session_id": "0ccb0f44-f9ae-4c55-bdad-62b800e07a3e"
     },
     {
       "topic": "ai",
@@ -104,7 +104,9 @@
       "artifacts": [
         "modified: path/to/file"
       ],
-      "sensitive": false
+      "sensitive": false,
+      "cwd": "/Users/francisyang/VibeCodingProjects/agent_sop",
+      "session_id": "09f8c108-a0e1-45ce-b01f-d4e135965eb5"
     }
   ],
   "filtered_out": [
@@ -130,16 +132,16 @@
     }
   ],
   "decisions": [
-    "Added 'Failures, Tradeoffs & Lessons' slide",
-    "Shape B as main UI with AI coach as sidecar",
-    "Use forms for onboarding, not chat",
-    "Pushed directly to main instead of feature branch",
-    "Generalized seed plan for universal health use"
+    "Used dark navy/teal color palette with amber accents",
+    "Structured slides to match interview format: problem \u2192 architecture \u2192 implementation \u2192 evaluation \u2192 impact",
+    "Added dedicated \"Failures, Tradeoffs & Lessons\" slide for self-awareness",
+    "Varied layouts with two-column, comparison tables, stat callouts, and 2x3 grids",
+    "Included version timeline and consumer grid for technical depth"
   ],
   "open_threads": [
-    "Write PRD for AI goal coach V2",
-    "Conduct competitive analysis for V2",
-    "Implement plan schema and data migration"
+    "Need to write the actual PRD document",
+    "Need to conduct competitive analysis for V2",
+    "Need to implement the plan schema and data migration"
   ],
   "decisions_extra": 11,
   "open_extra": 0

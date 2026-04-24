@@ -98,6 +98,8 @@ def to_reader_item(s: dict) -> dict:
         "open": s.get("open") or [],
         "artifacts": s.get("artifacts") or [],
         "sensitive": s.get("topic") == "job-seeking",
+        "cwd": s.get("cwd"),                       # needed by build_threads.py for cwd_signals
+        "session_id": s.get("session_id"),         # stable reference for thread touches
     }
 
 
