@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MyAIDebrief — Daily Journal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #e8e4db; min-height: 100vh; }
+  body { font-family: 'Inter Tight', system-ui, sans-serif; }
+  * { box-sizing: border-box; }
+  button { font-family: inherit; }
+
+  @keyframes ai-shimmer {
+    0%   { opacity: 0.5; }
+    50%  { opacity: 1; }
+    100% { opacity: 0.5; }
+  }
+  .ai-shimmer { animation: ai-shimmer 1.4s ease-in-out infinite; }
+
+  .page-wrap {
+    max-width: 1360px; margin: 0 auto; padding: 32px 20px;
+  }
+  .date-pager {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 16px; font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: #6a5a3a; letter-spacing: 1.5px; text-transform: uppercase;
+  }
+  .date-pager a {
+    color: #4a3d2a; text-decoration: none; padding: 4px 10px;
+    border: 1px solid #c8bfa6; border-radius: 4px; margin-left: 4px;
+  }
+  .date-pager a:hover { background: #ece3d1; }
+  .empty {
+    text-align: center; padding: 80px 20px; color: #8c7a5c;
+    font-family: 'Lora', serif; font-style: italic; font-size: 18px;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+
+<script type="text/babel">
+const TOPICS = {
+  health:        { label: 'Health',      color: 'oklch(0.68 0.11 145)' },
+  career:        { label: 'Career',      color: 'oklch(0.74 0.11 55)'  },
+  ai:            { label: 'AI',          color: 'oklch(0.68 0.11 265)' },
+  tech:          { label: 'Tech',        color: 'oklch(0.68 0.11 220)' },
+  travel:        { label: 'Travel',      color: 'oklch(0.70 0.11 25)'  },
+  'job-seeking': { label: 'Job seeking', color: 'oklch(0.70 0.11 335)' },
+  other:         { label: 'Other',       color: 'oklch(0.70 0.05 80)'  },
+};
+
+function fmtDur(min) {
+  if (!min) return '—';
+  if (min < 60) return `${min}m`;
+  const h = Math.floor(min / 60), m = min % 60;
+  return m === 0 ? `${h}h` : `${h}h${m}m`;
+}
+function formatLongDate(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+}
+
+function Chip({ active, onClick, color, label, count }) {
+  return (
+    <button onClick={onClick} style={{
+      display: 'flex', alignItems: 'center', gap: 8, width: '100%',
+      background: active ? 'rgba(74, 61, 42, 0.08)' : 'transparent',
+      border: 'none', borderRadius: 6, padding: '6px 8px', cursor: 'pointer',
+      fontFamily: 'inherit', textAlign: 'left', color: '#2a2520',
+    }}>
+      <span style={{ width: 8, height: 8, borderRadius: '50%', background: color }} />
+      <span style={{ flex: 1, fontSize: 14, fontFamily: 'Lora, serif',
+        fontStyle: active ? 'italic' : 'normal' }}>{label}</span>
+      <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#8c7a5c' }}>
+        {count}
+      </span>
+    </button>
+  );
+}
+
+function Flag({ label, items, c, mono }) {
+  return (
+    <div style={{ marginTop: 10 }}>
+      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: 1.5,
+        color: c, textTransform: 'uppercase', marginBottom: 2 }}>{label}</div>
+      {items.map((s, i) => (
+        <div key={i} style={{
+          fontFamily: mono ? 'JetBrains Mono, monospace' : 'Lora, serif',
+          fontSize: mono ? 12 : 14.5, color: '#3a3128', lineHeight: 1.5,
+          textIndent: -10, paddingLeft: 10, textWrap: 'pretty',
+        }}>— {s}</div>
+      ))}
+    </div>
+  );
+}
+
+function ObsidianReader({ day }) {
+  const [open, setOpen] = React.useState(() => new Set());
+  const [filter, setFilter] = React.useState(null);
+  const toggle = (k) => {
+    const n = new Set(open);
+    n.has(k) ? n.delete(k) : n.add(k);
+    setOpen(n);
+  };
+
+  const order = ['tech','ai','job-seeking','travel','health','career','other'];
+  const counts = React.useMemo(() => {
+    const c = {};
+    for (const it of (day.items || [])) c[it.topic] = (c[it.topic] || 0) + 1;
+    return c;
+  }, [day]);
+
+  const pad = '52px 68px';
+  const bodySize = 15.5;
+  const visible = filter ? (day.items || []).filter((i) => i.topic === filter) : (day.items || []);
+  const synthesized = (day.lessons || []).length > 0 || (day.summary || '').length > 20;
+
+  return (
+    <div style={{
+      width: '100%', minHeight: 1200,
+      display: 'grid', gridTemplateColumns: '240px 1fr 260px',
+      background: '#f3ece0', color: '#2a2520',
+      fontFamily: 'Lora, Georgia, serif',
+      borderRadius: 8, overflow: 'hidden',
+      boxShadow: '0 2px 24px rgba(60, 40, 10, 0.08)',
+    }}>
+      {/* Sidebar */}
+      <aside style={{
+        background: '#ece3d1', borderRight: '1px solid #d6cbb3', padding: '40px 24px',
+      }}>
+        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: 2,
+          color: '#8c7a5c', textTransform: 'uppercase', marginBottom: 14 }}>
+          Journal
+        </div>
+        <div style={{ fontFamily: 'Lora, serif', fontSize: 24, lineHeight: 1.15, marginBottom: 4,
+          fontStyle: 'italic' }}>{day.dow}</div>
+        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#8c7a5c' }}>
+          {day.date}
+        </div>
+
+        <div style={{ marginTop: 28, fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+          letterSpacing: 2, color: '#8c7a5c', textTransform: 'uppercase', marginBottom: 10 }}>
+          Topics
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <Chip active={filter === null} onClick={() => setFilter(null)} color="#4a3d2a"
+            label="All" count={(day.items || []).length} />
+          {order.filter((k) => counts[k]).map((k) => (
+            <Chip key={k} active={filter === k} onClick={() => setFilter(k)}
+              color={(TOPICS[k] || TOPICS.other).color}
+              label={(TOPICS[k] || TOPICS.other).label}
+              count={counts[k]} />
+          ))}
+        </div>
+
+        <div style={{ marginTop: 28, fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+          letterSpacing: 2, color: '#8c7a5c', textTransform: 'uppercase', marginBottom: 10 }}>
+          Devices
+        </div>
+        {(day.devices || []).map((d) => (
+          <div key={d.slug} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 0',
+            fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#4a3d2a' }}>
+            <span style={{ width: 7, height: 7, borderRadius: '50%',
+              background: d.sessions > 0 ? '#6a8a5a' : '#c88a6a' }} />
+            <span style={{ flex: 1 }}>{d.slug}</span>
+            <span style={{ color: '#8c7a5c' }}>{d.lastSync}</span>
+          </div>
+        ))}
+
+        {(day.filtered_out || []).length > 0 && (
+          <>
+            <div style={{ marginTop: 28, fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+              letterSpacing: 2, color: '#8c7a5c', textTransform: 'uppercase', marginBottom: 10 }}>
+              Filtered out
+            </div>
+            {(day.filtered_out || []).map((f, i) => (
+              <div key={i} style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
+                color: '#a89478', padding: '2px 0' }}>
+                <span style={{ textDecoration: 'line-through' }}>{f.topic}</span>
+                <span style={{ marginLeft: 6 }}>· {f.dur}m</span>
+              </div>
+            ))}
+          </>
+        )}
+      </aside>
+
+      {/* Page */}
+      <main style={{ padding: pad, position: 'relative',
+        backgroundImage: 'linear-gradient(#e6dcc6 1px, transparent 1px)',
+        backgroundSize: `100% ${bodySize * 1.7}px`,
+        backgroundPosition: `0 ${bodySize * 1.7 - 2}px`,
+      }}>
+        <div style={{ position: 'absolute', top: 0, bottom: 0, left: '50px',
+          width: 1, background: 'rgba(200, 100, 80, 0.25)' }} />
+
+        <h1 style={{ fontFamily: 'Lora, serif', fontSize: 44, fontWeight: 500, margin: 0,
+          lineHeight: 1.05, letterSpacing: -1, fontStyle: 'italic' }}>
+          {formatLongDate(day.date)}.
+        </h1>
+        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#8c7a5c',
+          marginTop: 8, letterSpacing: 1 }}>
+          {day.sessions_kept}/{day.sessions_total} kept · {Object.keys(counts).length} topics
+        </div>
+
+        {day.honest && day.honest !== '—' && (
+          <div style={{ marginTop: 28, fontSize: bodySize + 2, lineHeight: 1.7, fontStyle: 'italic',
+            color: '#3a3128', maxWidth: '58ch', textWrap: 'pretty',
+            borderLeft: '3px solid #c26a4a', paddingLeft: 18 }}>
+            {day.honest}
+          </div>
+        )}
+
+        <div style={{ marginTop: 22, fontSize: bodySize, lineHeight: 1.7, color: '#2a2520',
+          maxWidth: '64ch', textWrap: 'pretty', minHeight: bodySize * 1.7 * 3 }}>
+          {day.summary}
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6,
+            marginLeft: 10, fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+            color: '#8c7a5c', letterSpacing: 1, verticalAlign: 2,
+            padding: '2px 6px', border: '1px solid #d6cbb3', borderRadius: 3 }}>
+            <span style={{ width: 5, height: 5, borderRadius: '50%',
+              background: synthesized ? '#6a8a5a' : '#a89478' }} />
+            {synthesized ? 'synthesized by claude' : 'placeholder'}
+          </span>
+        </div>
+
+        {/* Sessions */}
+        <div style={{ marginTop: 36 }}>
+          {visible.length === 0 && (
+            <div style={{ fontFamily: 'Lora, serif', fontStyle: 'italic', color: '#a89478', padding: '20px 0' }}>
+              No sessions for this filter.
+            </div>
+          )}
+          {visible.map((it, i) => {
+            const key = it.start + it.title;
+            const isOpen = open.has(key);
+            const topic = TOPICS[it.topic] || TOPICS.other;
+            return (
+              <article key={i} style={{ padding: '14px 0', borderBottom: '1px solid #d6cbb3' }}>
+                <div onClick={() => toggle(key)} style={{ cursor: 'pointer',
+                  display: 'grid', gridTemplateColumns: '64px 10px 1fr auto', gap: 12,
+                  alignItems: 'baseline' }}>
+                  <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
+                    color: '#8c7a5c', fontVariantNumeric: 'tabular-nums' }}>
+                    {it.start}
+                  </span>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: topic.color,
+                    marginTop: 6 }} />
+                  <span style={{ fontFamily: 'Lora, serif', fontSize: bodySize + 3, lineHeight: 1.35,
+                    fontWeight: 500, textWrap: 'balance' }}>
+                    {it.title}
+                    {it.sensitive && (
+                      <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9,
+                        letterSpacing: 1, color: '#c26a4a', background: '#f7e8df', padding: '2px 6px',
+                        borderRadius: 3, marginLeft: 10, verticalAlign: 2 }}>
+                        sensitive
+                      </span>
+                    )}
+                  </span>
+                  <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
+                    color: '#8c7a5c' }}>{fmtDur(it.dur)}</span>
+                </div>
+                {isOpen && (
+                  <div style={{ paddingLeft: 86, marginTop: 10 }}>
+                    <div style={{ fontSize: bodySize, lineHeight: 1.65, color: '#3a3128',
+                      maxWidth: '60ch', textWrap: 'pretty' }}>
+                      {it.body}
+                    </div>
+                    {(it.decisions || []).length > 0 && <Flag label="decisions" items={it.decisions} c="#6a8a5a" />}
+                    {(it.open || []).length > 0 && <Flag label="open" items={it.open} c="#c26a4a" />}
+                    {(it.artifacts || []).length > 0 && <Flag label="artifacts" items={it.artifacts} c="#8c7a5c" mono />}
+                  </div>
+                )}
+              </article>
+            );
+          })}
+        </div>
+      </main>
+
+      {/* Right rail */}
+      <aside style={{
+        background: '#ede4d2', borderLeft: '1px solid #d6cbb3', padding: '48px 24px',
+      }}>
+        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: 2,
+          textTransform: 'uppercase', color: '#6a8a5a', marginBottom: 12 }}>
+          Decisions made
+        </div>
+        {(day.decisions || []).length === 0 ? (
+          <div style={{ fontFamily: 'Lora, serif', fontStyle: 'italic', color: '#a89478', fontSize: 14 }}>—</div>
+        ) : (day.decisions || []).map((s, i) => (
+          <div key={i} style={{
+            fontFamily: 'Lora, serif', fontSize: 14.5, lineHeight: 1.45, color: '#2a2520',
+            padding: '8px 0', borderTop: i === 0 ? 'none' : '1px dashed #d6cbb3',
+            display: 'flex', gap: 8, textWrap: 'pretty',
+          }}>
+            <span style={{ color: '#6a8a5a', flex: '0 0 auto' }}>✓</span>
+            <span>{s}</span>
+          </div>
+        ))}
+
+        <div style={{ marginTop: 28, fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+          letterSpacing: 2, textTransform: 'uppercase', color: '#c26a4a', marginBottom: 12 }}>
+          Open threads
+        </div>
+        {(day.open_threads || []).length === 0 ? (
+          <div style={{ fontFamily: 'Lora, serif', fontStyle: 'italic', color: '#a89478', fontSize: 14 }}>—</div>
+        ) : (day.open_threads || []).map((s, i) => (
+          <div key={i} style={{
+            fontFamily: 'Lora, serif', fontSize: 14.5, lineHeight: 1.45, color: '#2a2520',
+            padding: '8px 0', borderTop: i === 0 ? 'none' : '1px dashed #d6cbb3',
+            display: 'flex', gap: 8, textWrap: 'pretty',
+          }}>
+            <span style={{ color: '#c26a4a', flex: '0 0 auto', fontFamily: 'JetBrains Mono, monospace',
+              fontSize: 12, marginTop: 1 }}>○</span>
+            <span>{s}</span>
+          </div>
+        ))}
+
+        <div style={{ marginTop: 28, fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+          letterSpacing: 2, textTransform: 'uppercase', color: '#8c6a3d', marginBottom: 12,
+          display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span>Lessons learned</span>
+          {synthesized && (day.lessons || []).length > 0 && (
+            <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#6a8a5a' }} />
+          )}
+        </div>
+        {(day.lessons || []).length === 0 ? (
+          <div style={{ fontFamily: 'Lora, serif', fontStyle: 'italic', color: '#a89478', fontSize: 14 }}>—</div>
+        ) : (day.lessons || []).map((s, i) => (
+          <div key={i} style={{
+            fontFamily: 'Lora, serif', fontSize: 14.5, lineHeight: 1.45, color: '#2a2520',
+            fontStyle: 'italic', padding: '8px 0',
+            borderTop: i === 0 ? 'none' : '1px dashed #d6cbb3',
+            display: 'flex', gap: 8, textWrap: 'pretty',
+          }}>
+            <span style={{ color: '#8c6a3d', flex: '0 0 auto', fontStyle: 'normal' }}>✎</span>
+            <span>{s}</span>
+          </div>
+        ))}
+      </aside>
+    </div>
+  );
+}
+
+function App() {
+  const [day, setDay] = React.useState(null);
+  const [err, setErr] = React.useState(null);
+
+  React.useEffect(() => {
+    fetch('../data/day.json?ts=' + Date.now())
+      .then((r) => { if (!r.ok) throw new Error('no data/day.json — run ./build.sh first'); return r.json(); })
+      .then(setDay)
+      .catch((e) => setErr(e.message));
+  }, []);
+
+  if (err) return (
+    <div className="empty">
+      <div>{err}</div>
+      <div style={{ fontSize: 13, marginTop: 16, fontStyle: 'normal', fontFamily: 'JetBrains Mono, monospace' }}>
+        cd claude-journal && ./build.sh
+      </div>
+    </div>
+  );
+  if (!day) return <div className="empty">Loading…</div>;
+
+  return (
+    <div className="page-wrap">
+      <ObsidianReader day={day} />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

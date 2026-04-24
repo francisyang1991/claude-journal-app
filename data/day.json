@@ -1,0 +1,110 @@
+{
+  "date": "2026-04-23",
+  "dow": "Thursday",
+  "devices": [
+    {
+      "slug": "mac",
+      "sessions": 6,
+      "lastSync": "16:46"
+    }
+  ],
+  "sessions_total": 8,
+  "sessions_kept": 6,
+  "honest": "\u2014",
+  "summary": "6 sessions across 2 topics.",
+  "lessons": [],
+  "items": [
+    {
+      "topic": "tech",
+      "device": "mac",
+      "source": "cowork",
+      "start": "16:20",
+      "dur": 51566,
+      "title": "interviewPrep",
+      "body": "\u2014",
+      "decisions": [],
+      "open": [],
+      "artifacts": [],
+      "sensitive": false
+    },
+    {
+      "topic": "ai",
+      "device": "mac",
+      "source": "cowork",
+      "start": "09:05",
+      "dur": 1,
+      "title": "Fetch yage newsletter",
+      "body": "\u2014",
+      "decisions": [],
+      "open": [],
+      "artifacts": [],
+      "sensitive": false
+    },
+    {
+      "topic": "tech",
+      "device": "mac",
+      "source": "claude-code",
+      "start": "09:29",
+      "dur": 444,
+      "title": "Check files.zip for next task",
+      "body": "\u2014",
+      "decisions": [],
+      "open": [],
+      "artifacts": [],
+      "sensitive": false
+    },
+    {
+      "topic": "ai",
+      "device": "mac",
+      "source": "claude-code",
+      "start": "09:30",
+      "dur": 5,
+      "title": "Analyze competitors for product-management competitive brief",
+      "body": "\u2014",
+      "decisions": [],
+      "open": [],
+      "artifacts": [],
+      "sensitive": false
+    },
+    {
+      "topic": "ai",
+      "device": "mac",
+      "source": "claude-code",
+      "start": "11:47",
+      "dur": 4,
+      "title": "Push local code to remote",
+      "body": "\u2014",
+      "decisions": [],
+      "open": [],
+      "artifacts": [],
+      "sensitive": false
+    },
+    {
+      "topic": "tech",
+      "device": "mac",
+      "source": "claude-code",
+      "start": "14:28",
+      "dur": 138,
+      "title": "Set up MetaGlass SDK and explore app ideas",
+      "body": "\u2014",
+      "decisions": [],
+      "open": [],
+      "artifacts": [],
+      "sensitive": false
+    }
+  ],
+  "filtered_out": [
+    {
+      "topic": "esd_unemployment",
+      "device": "?",
+      "dur": 205
+    },
+    {
+      "topic": "wedding",
+      "device": "?",
+      "dur": 55800
+    }
+  ],
+  "decisions": [],
+  "open_threads": []
+}

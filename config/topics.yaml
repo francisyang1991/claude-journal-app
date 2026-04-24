@@ -1,0 +1,22 @@
+# Keywords for cheap topic guessing. Deliberately exclude generic words
+# that appear in every Claude session (claude, prompt, anthropic, LLM) —
+# those don't discriminate between topics.
+topics:
+  health:
+    keywords: [sleep, exercise, doctor, symptom, diet, fitness, bloodwork, pain, stretch, workout, Oura, resting HR]
+    label: Health
+  career:
+    keywords: [promotion, manager, compensation, career path, performance review, "1:1", skip-level]
+    label: Career
+  ai:
+    keywords: [agent, RAG, fine-tune, embedding, eval, multi-agent, orchestration, AutoGen, langgraph]
+    label: AI
+  tech:
+    keywords: [bug, refactor, websocket, migration, pytest, typescript, python, API, database, SDK, deploy, git, MetaGlass]
+    label: Tech
+  travel:
+    keywords: [flight, hotel, itinerary, visa, airport, award, booking, taipei, japan, tokyo]
+    label: Travel
+  job-seeking:
+    keywords: [interview, resume, recruiter, leetcode, offer letter, STAR, OpenAI Ads, system design round, interviewPrep]
+    label: Job seeking

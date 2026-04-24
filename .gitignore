@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.claude-journal-state.json
+
+# raw/summaries-*.json is an intermediate artifact — synthesis agent writes it,
+# then reads it to produce data/day.json. We only commit raw/sessions-*.json
+# (device output) and data/day.json (final report).
+raw/summaries-*.json
+
