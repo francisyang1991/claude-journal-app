@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   html, body { margin: 0; padding: 0; background: #e8e4db; min-height: 100vh; }
   body { font-family: 'Inter Tight', system-ui, sans-serif; }
@@ -37,6 +37,22 @@
     text-align: center; padding: 80px 20px; color: #8c7a5c;
     font-family: 'Lora', serif; font-style: italic; font-size: 18px;
   }
+
+  /* View toggle */
+  .view-toggle {
+    display: flex; justify-content: center; margin-bottom: 20px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+  }
+  .view-toggle .seg {
+    display: inline-flex; background: #d6cbb3; border-radius: 8px; padding: 3px;
+  }
+  .view-toggle button {
+    background: transparent; border: none; padding: 8px 18px;
+    font-family: inherit; font-size: inherit; letter-spacing: inherit;
+    text-transform: inherit; color: #6a5a3a; cursor: pointer; border-radius: 6px;
+  }
+  .view-toggle button.active { background: #1b1a17; color: #f3ece0; }
 </style>
 </head>
 <body>
@@ -361,9 +377,232 @@ function ObsidianReader({ day }) {
   );
 }
 
+// --- Option A · Editorial variant ---------------------------------------
+function SideList({ title, items, accent, extra }) {
+  return (
+    <div>
+      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: 2,
+        textTransform: 'uppercase', color: accent, marginBottom: 10 }}>{title}</div>
+      {(items || []).length === 0 ? (
+        <div style={{ fontFamily: 'Fraunces, serif', fontStyle: 'italic', color: '#a8a090' }}>—</div>
+      ) : (items || []).map((s, i) => (
+        <div key={i} style={{ fontFamily: 'Fraunces, serif', fontSize: 15, lineHeight: 1.4,
+          color: '#2b2823', marginBottom: 8, paddingLeft: 12, position: 'relative', textWrap: 'pretty' }}>
+          <span style={{ position: 'absolute', left: 0, color: accent }}>§</span>{s}
+        </div>
+      ))}
+      {(extra || 0) > 0 && (
+        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+          color: '#a8a090', letterSpacing: 1, marginTop: 4 }}>
+          +{extra} more in sessions below
+        </div>
+      )}
+    </div>
+  );
+}
+function InlineList({ title, items }) {
+  return (
+    <div style={{ marginTop: 10 }}>
+      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: 1.5,
+        textTransform: 'uppercase', color: '#8a8275', marginBottom: 4 }}>{title}</div>
+      {items.map((s, i) => (
+        <div key={i} style={{ fontFamily: 'Fraunces, serif', fontSize: 14, lineHeight: 1.45,
+          color: '#2b2823', paddingLeft: 14, textIndent: -8, textWrap: 'pretty' }}>— {s}</div>
+      ))}
+    </div>
+  );
+}
+
+function EditorialReader({ day }) {
+  const [expanded, setExpanded] = React.useState(() => new Set());
+  const toggle = (k) => {
+    const n = new Set(expanded);
+    n.has(k) ? n.delete(k) : n.add(k);
+    setExpanded(n);
+  };
+
+  const byTopic = React.useMemo(() => {
+    const map = {};
+    for (const it of (day.items || [])) (map[it.topic] ||= []).push(it);
+    return map;
+  }, [day]);
+
+  const order = ['tech', 'ai', 'job-seeking', 'travel', 'health', 'career', 'other'];
+  const topicsToday = order.filter((t) => byTopic[t]);
+  const pad = '64px 88px';
+  const bodySize = 17;
+
+  return (
+    <div style={{
+      width: '100%', minHeight: 1200, background: '#faf8f4', color: '#1b1a17',
+      fontFamily: 'Fraunces, Georgia, serif', padding: pad, boxSizing: 'border-box',
+      borderRadius: 8, boxShadow: '0 2px 24px rgba(60, 40, 10, 0.08)',
+    }}>
+      {/* Masthead */}
+      <div style={{ borderBottom: '1.5px solid #1b1a17', paddingBottom: 16, marginBottom: 32,
+        display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+        <div>
+          <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, letterSpacing: 2,
+            textTransform: 'uppercase', color: '#6b645a' }}>
+            The Daily — {day.date}
+          </div>
+          <div style={{ fontFamily: 'Fraunces, serif', fontSize: 52, fontWeight: 400,
+            letterSpacing: -1.5, lineHeight: 1, marginTop: 8, fontStyle: 'italic' }}>
+            {day.dow}, {formatLongDate(day.date)}
+          </div>
+        </div>
+        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#6b645a',
+          textAlign: 'right', lineHeight: 1.7 }}>
+          <div>{day.sessions_kept} of {day.sessions_total} kept</div>
+          <div>{(day.devices || []).length} devices synced</div>
+          <div>{topicsToday.length} topics touched</div>
+        </div>
+      </div>
+
+      {/* Lede */}
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 56, marginBottom: 48 }}>
+        <div>
+          {day.honest && day.honest !== '—' && (
+            <>
+              <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: 2,
+                textTransform: 'uppercase', color: '#a86a3d', marginBottom: 10 }}>
+                — One honest line —
+              </div>
+              <div style={{ fontFamily: 'Fraunces, serif', fontStyle: 'italic', fontSize: 28,
+                lineHeight: 1.25, fontWeight: 400, color: '#1b1a17', letterSpacing: -0.3,
+                textWrap: 'pretty' }}>
+                “{day.honest}”
+              </div>
+            </>
+          )}
+          <div style={{ marginTop: 28, fontSize: bodySize, lineHeight: 1.55, color: '#2b2823',
+            textWrap: 'pretty', maxWidth: '58ch' }}>
+            {day.summary}
+          </div>
+        </div>
+        <div style={{ borderLeft: '1px solid #d9d2c4', paddingLeft: 24 }}>
+          <SideList title="Decisions made" items={day.decisions} accent="#a86a3d" extra={day.decisions_extra} />
+          <div style={{ height: 20 }} />
+          <SideList title="Open threads" items={day.open_threads} accent="#6b645a" extra={day.open_extra} />
+          {(day.lessons || []).length > 0 && (
+            <>
+              <div style={{ height: 20 }} />
+              <div>
+                <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: 2,
+                  textTransform: 'uppercase', color: '#8c6a3d', marginBottom: 10 }}>Lessons learned</div>
+                {day.lessons.map((s, i) => (
+                  <div key={i} style={{ fontFamily: 'Fraunces, serif', fontSize: 15, lineHeight: 1.4,
+                    color: '#2b2823', marginBottom: 8, paddingLeft: 12, position: 'relative',
+                    fontStyle: 'italic', textWrap: 'pretty' }}>
+                    <span style={{ position: 'absolute', left: 0, color: '#8c6a3d', fontStyle: 'normal' }}>✎</span>{s}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* By topic */}
+      <div style={{ borderTop: '1.5px solid #1b1a17', paddingTop: 16 }}>
+        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: 2,
+          textTransform: 'uppercase', color: '#6b645a', marginBottom: 24 }}>
+          — By topic —
+        </div>
+        {topicsToday.map((tk) => {
+          const items = byTopic[tk];
+          const totalMin = items.reduce((a, b) => a + (b.dur || 0), 0);
+          const topic = TOPICS[tk] || TOPICS.other;
+          return (
+            <div key={tk} style={{ marginBottom: 36 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 10,
+                borderBottom: '1px dashed #c8c0b0', paddingBottom: 8 }}>
+                <span style={{ width: 10, height: 10, borderRadius: '50%', background: topic.color,
+                  display: 'inline-block' }} />
+                <div style={{ fontFamily: 'Fraunces, serif', fontSize: 26, fontStyle: 'italic',
+                  fontWeight: 400, letterSpacing: -0.5 }}>{topic.label}</div>
+                <div style={{ flex: 1 }} />
+                <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#6b645a' }}>
+                  {items.length} sess · {fmtDur(totalMin)}
+                </div>
+              </div>
+              {items.map((it, idx) => {
+                const key = `${tk}-${idx}`;
+                const isOpen = expanded.has(key);
+                return (
+                  <div key={key} style={{ padding: '14px 0', borderBottom: '1px solid #eee6d6' }}>
+                    <div onClick={() => toggle(key)} style={{ display: 'grid',
+                      gridTemplateColumns: '72px 1fr auto', gap: 16, alignItems: 'baseline',
+                      cursor: 'pointer' }}>
+                      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
+                        color: '#6b645a', fontVariantNumeric: 'tabular-nums' }}>
+                        {it.start}
+                      </div>
+                      <div>
+                        <div style={{ fontFamily: 'Fraunces, serif', fontSize: 20, lineHeight: 1.3,
+                          fontWeight: 500, textWrap: 'balance' }}>
+                          {it.title}
+                          {it.sensitive && (
+                            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 9,
+                              letterSpacing: 1, color: '#a86a3d', border: '1px solid #a86a3d',
+                              padding: '1px 5px', borderRadius: 3, marginLeft: 10, verticalAlign: 2 }}>
+                              SENSITIVE
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+                          color: '#8a8275', marginTop: 4, letterSpacing: 0.4 }}>
+                          {it.device} · {it.source} · {fmtDur(it.dur)}
+                        </div>
+                      </div>
+                      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 14,
+                        color: '#a86a3d', width: 16, textAlign: 'right' }}>
+                        {isOpen ? '–' : '+'}
+                      </div>
+                    </div>
+                    {isOpen && (
+                      <div style={{ paddingLeft: 88, paddingTop: 10, paddingBottom: 6 }}>
+                        <div style={{ fontSize: bodySize - 1, lineHeight: 1.55, color: '#2b2823',
+                          maxWidth: '62ch', textWrap: 'pretty' }}>
+                          {it.body}
+                        </div>
+                        {(it.decisions || []).length > 0 && <InlineList title="Decisions" items={it.decisions} />}
+                        {(it.open || []).length > 0 && <InlineList title="Open" items={it.open} />}
+                        {(it.artifacts || []).length > 0 && (
+                          <div style={{ marginTop: 10, fontFamily: 'JetBrains Mono, monospace',
+                            fontSize: 11, color: '#6b645a' }}>
+                            {it.artifacts.map((a, i) => <div key={i}>· {a}</div>)}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Colophon */}
+      <div style={{ marginTop: 40, paddingTop: 16, borderTop: '1.5px solid #1b1a17',
+        display: 'flex', justifyContent: 'space-between',
+        fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: '#6b645a', letterSpacing: 1 }}>
+        <span>FILTERED — {(day.filtered_out || []).map((f) => f.topic).join(' · ') || 'nothing'}</span>
+        <span>synthesized by claude · git@claude-journal:main</span>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const [day, setDay] = React.useState(null);
   const [err, setErr] = React.useState(null);
+  const [view, setView] = React.useState(() => localStorage.getItem('journal_view') || 'obsidian');
+
+  React.useEffect(() => {
+    localStorage.setItem('journal_view', view);
+  }, [view]);
 
   React.useEffect(() => {
     fetch('../data/day.json?ts=' + Date.now())
@@ -384,7 +623,13 @@ function App() {
 
   return (
     <div className="page-wrap">
-      <ObsidianReader day={day} />
+      <div className="view-toggle">
+        <div className="seg">
+          <button className={view === 'obsidian' ? 'active' : ''} onClick={() => setView('obsidian')}>C · Obsidian</button>
+          <button className={view === 'editorial' ? 'active' : ''} onClick={() => setView('editorial')}>A · Editorial</button>
+        </div>
+      </div>
+      {view === 'editorial' ? <EditorialReader day={day} /> : <ObsidianReader day={day} />}
     </div>
   );
 }
