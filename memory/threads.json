@@ -1,0 +1,423 @@
+{
+  "updated_at": "2026-04-24T19:53:27.185724+00:00",
+  "threads": [
+    {
+      "id": "th_cfbc43b08d",
+      "title": "Need to verify demo code functionality",
+      "state": "active",
+      "origin_kind": "open",
+      "topic": "ai",
+      "created_on": "2026-04-22",
+      "last_touched_on": "2026-04-22",
+      "touches": [
+        {
+          "date": "2026-04-22",
+          "session_id": "unknown",
+          "cwd": null,
+          "source": "cowork",
+          "kind": "open"
+        }
+      ],
+      "cwd_signals": [],
+      "resolution": null,
+      "resolution_date": null,
+      "aliases": []
+    },
+    {
+      "id": "th_9963152d03",
+      "title": "Should add troubleshooting tips for common errors",
+      "state": "active",
+      "origin_kind": "open",
+      "topic": "ai",
+      "created_on": "2026-04-22",
+      "last_touched_on": "2026-04-22",
+      "touches": [
+        {
+          "date": "2026-04-22",
+          "session_id": "unknown",
+          "cwd": null,
+          "source": "cowork",
+          "kind": "open"
+        }
+      ],
+      "cwd_signals": [],
+      "resolution": null,
+      "resolution_date": null,
+      "aliases": []
+    },
+    {
+      "id": "th_66b3e0a0a8",
+      "title": "May need to adjust timing based on student feedback",
+      "state": "active",
+      "origin_kind": "open",
+      "topic": "ai",
+      "created_on": "2026-04-22",
+      "last_touched_on": "2026-04-22",
+      "touches": [
+        {
+          "date": "2026-04-22",
+          "session_id": "unknown",
+          "cwd": null,
+          "source": "cowork",
+          "kind": "open"
+        }
+      ],
+      "cwd_signals": [],
+      "resolution": null,
+      "resolution_date": null,
+      "aliases": []
+    },
+    {
+      "id": "th_dcd39f5281",
+      "title": "Design review feedback pending",
+      "state": "active",
+      "origin_kind": "open",
+      "topic": "tech",
+      "created_on": "2026-04-22",
+      "last_touched_on": "2026-04-22",
+      "touches": [
+        {
+          "date": "2026-04-22",
+          "session_id": "unknown",
+          "cwd": null,
+          "source": "claude-code",
+          "kind": "open"
+        }
+      ],
+      "cwd_signals": [],
+      "resolution": null,
+      "resolution_date": null,
+      "aliases": []
+    },
+    {
+      "id": "th_7755c5d214",
+      "title": "Mobile tap target sizing confirmed",
+      "state": "active",
+      "origin_kind": "open",
+      "topic": "tech",
+      "created_on": "2026-04-22",
+      "last_touched_on": "2026-04-22",
+      "touches": [
+        {
+          "date": "2026-04-22",
+          "session_id": "unknown",
+          "cwd": null,
+          "source": "claude-code",
+          "kind": "open"
+        }
+      ],
+      "cwd_signals": [],
+      "resolution": null,
+      "resolution_date": null,
+      "aliases": []
+    },
+    {
+      "id": "th_66554ef6cb",
+      "title": "Code review fixes ready to commit",
+      "state": "active",
+      "origin_kind": "open",
+      "topic": "tech",
+      "created_on": "2026-04-22",
+      "last_touched_on": "2026-04-22",
+      "touches": [
+        {
+          "date": "2026-04-22",
+          "session_id": "unknown",
+          "cwd": null,
+          "source": "claude-code",
+          "kind": "open"
+        }
+      ],
+      "cwd_signals": [],
+      "resolution": null,
+      "resolution_date": null,
+      "aliases": []
+    },
+    {
+      "id": "th_2c9cda1fc9",
+      "title": "What specific Gmail filters to apply?",
+      "state": "active",
+      "origin_kind": "open",
+      "topic": "tech",
+      "created_on": "2026-04-22",
+      "last_touched_on": "2026-04-22",
+      "touches": [
+        {
+          "date": "2026-04-22",
+          "session_id": "unknown",
+          "cwd": null,
+          "source": "cowork",
+          "kind": "open"
+        }
+      ],
+      "cwd_signals": [],
+      "resolution": null,
+      "resolution_date": null,
+      "aliases": []
+    },
+    {
+      "id": "th_8a1429db08",
+      "title": "How to prioritize emails (unread, starred, labels)?",
+      "state": "active",
+      "origin_kind": "open",
+      "topic": "tech",
+      "created_on": "2026-04-22",
+      "last_touched_on": "2026-04-22",
+      "touches": [
+        {
+          "date": "2026-04-22",
+          "session_id": "unknown",
+          "cwd": null,
+          "source": "cowork",
+          "kind": "open"
+        }
+      ],
+      "cwd_signals": [],
+      "resolution": null,
+      "resolution_date": null,
+      "aliases": []
+    },
+    {
+      "id": "th_3f9463f1c3",
+      "title": "Should it show upcoming meetings inline?",
+      "state": "active",
+      "origin_kind": "open",
+      "topic": "tech",
+      "created_on": "2026-04-22",
+      "last_touched_on": "2026-04-22",
+      "touches": [
+        {
+          "date": "2026-04-22",
+          "session_id": "unknown",
+          "cwd": null,
+          "source": "cowork",
+          "kind": "open"
+        }
+      ],
+      "cwd_signals": [],
+      "resolution": null,
+      "resolution_date": null,
+      "aliases": []
+    },
+    {
+      "id": "th_3aeae52718",
+      "title": "Need to write the actual PRD document",
+      "state": "active",
+      "origin_kind": "open",
+      "topic": "health",
+      "created_on": "2026-04-23",
+      "last_touched_on": "2026-04-23",
+      "touches": [
+        {
+          "date": "2026-04-23",
+          "session_id": "unknown",
+          "cwd": null,
+          "source": "claude-code",
+          "kind": "open"
+        }
+      ],
+      "cwd_signals": [],
+      "resolution": null,
+      "resolution_date": null,
+      "aliases": []
+    },
+    {
+      "id": "th_8bb98eb5cc",
+      "title": "Need to conduct competitive analysis for V2",
+      "state": "active",
+      "origin_kind": "open",
+      "topic": "health",
+      "created_on": "2026-04-23",
+      "last_touched_on": "2026-04-23",
+      "touches": [
+        {
+          "date": "2026-04-23",
+          "session_id": "unknown",
+          "cwd": null,
+          "source": "claude-code",
+          "kind": "open"
+        }
+      ],
+      "cwd_signals": [],
+      "resolution": null,
+      "resolution_date": null,
+      "aliases": []
+    },
+    {
+      "id": "th_8c87d5379d",
+      "title": "Need to implement the plan schema and data migration",
+      "state": "active",
+      "origin_kind": "open",
+      "topic": "health",
+      "created_on": "2026-04-23",
+      "last_touched_on": "2026-04-23",
+      "touches": [
+        {
+          "date": "2026-04-23",
+          "session_id": "unknown",
+          "cwd": null,
+          "source": "claude-code",
+          "kind": "open"
+        }
+      ],
+      "cwd_signals": [],
+      "resolution": null,
+      "resolution_date": null,
+      "aliases": []
+    },
+    {
+      "id": "th_e748828fde",
+      "title": "How to handle plan upload and calendar integration",
+      "state": "active",
+      "origin_kind": "open",
+      "topic": "tech",
+      "created_on": "2026-04-24",
+      "last_touched_on": "2026-04-24",
+      "touches": [
+        {
+          "date": "2026-04-24",
+          "session_id": "unknown",
+          "cwd": null,
+          "source": "claude-code",
+          "kind": "open"
+        }
+      ],
+      "cwd_signals": [],
+      "resolution": null,
+      "resolution_date": null,
+      "aliases": []
+    },
+    {
+      "id": "th_3c1aa01256",
+      "title": "Whether to keep any AI features for parsing simple habits",
+      "state": "active",
+      "origin_kind": "open",
+      "topic": "tech",
+      "created_on": "2026-04-24",
+      "last_touched_on": "2026-04-24",
+      "touches": [
+        {
+          "date": "2026-04-24",
+          "session_id": "unknown",
+          "cwd": null,
+          "source": "claude-code",
+          "kind": "open"
+        }
+      ],
+      "cwd_signals": [],
+      "resolution": null,
+      "resolution_date": null,
+      "aliases": []
+    },
+    {
+      "id": "th_a3a2bf82b8",
+      "title": "Native app requirement for iOS reminders",
+      "state": "active",
+      "origin_kind": "open",
+      "topic": "tech",
+      "created_on": "2026-04-24",
+      "last_touched_on": "2026-04-24",
+      "touches": [
+        {
+          "date": "2026-04-24",
+          "session_id": "unknown",
+          "cwd": null,
+          "source": "claude-code",
+          "kind": "open"
+        }
+      ],
+      "cwd_signals": [],
+      "resolution": null,
+      "resolution_date": null,
+      "aliases": []
+    },
+    {
+      "id": "th_4395cfa0c6",
+      "title": "Refine stop placement to reduce oversized risk per trade",
+      "state": "active",
+      "origin_kind": "open",
+      "topic": "tech",
+      "created_on": "2026-04-24",
+      "last_touched_on": "2026-04-24",
+      "touches": [
+        {
+          "date": "2026-04-24",
+          "session_id": "unknown",
+          "cwd": null,
+          "source": "claude-code",
+          "kind": "open"
+        }
+      ],
+      "cwd_signals": [],
+      "resolution": null,
+      "resolution_date": null,
+      "aliases": []
+    },
+    {
+      "id": "th_7a47f136af",
+      "title": "Implement MTR and pullback strategies after v1 validation",
+      "state": "active",
+      "origin_kind": "open",
+      "topic": "tech",
+      "created_on": "2026-04-24",
+      "last_touched_on": "2026-04-24",
+      "touches": [
+        {
+          "date": "2026-04-24",
+          "session_id": "unknown",
+          "cwd": null,
+          "source": "claude-code",
+          "kind": "open"
+        }
+      ],
+      "cwd_signals": [],
+      "resolution": null,
+      "resolution_date": null,
+      "aliases": []
+    },
+    {
+      "id": "th_c80bff828b",
+      "title": "Optimize parameters via walk-forward analysis",
+      "state": "active",
+      "origin_kind": "open",
+      "topic": "tech",
+      "created_on": "2026-04-24",
+      "last_touched_on": "2026-04-24",
+      "touches": [
+        {
+          "date": "2026-04-24",
+          "session_id": "unknown",
+          "cwd": null,
+          "source": "claude-code",
+          "kind": "open"
+        }
+      ],
+      "cwd_signals": [],
+      "resolution": null,
+      "resolution_date": null,
+      "aliases": []
+    },
+    {
+      "id": "th_2011d92d96",
+      "title": "Test multi-timeframe context integration",
+      "state": "active",
+      "origin_kind": "open",
+      "topic": "tech",
+      "created_on": "2026-04-24",
+      "last_touched_on": "2026-04-24",
+      "touches": [
+        {
+          "date": "2026-04-24",
+          "session_id": "unknown",
+          "cwd": null,
+          "source": "claude-code",
+          "kind": "open"
+        }
+      ],
+      "cwd_signals": [],
+      "resolution": null,
+      "resolution_date": null,
+      "aliases": []
+    }
+  ]
+}

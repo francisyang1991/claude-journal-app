@@ -1,18 +1,18 @@
 {
   "date": "2026-04-23",
   "device": "mac",
-  "generated_at": "2026-04-24T06:27:22.698721+00:00",
+  "generated_at": "2026-04-24T19:51:55.311408+00:00",
   "sessions_total": 8,
-  "sessions_kept": 6,
+  "sessions_kept": 4,
   "kept": [
     {
       "session_id": "local_6d1d61af-9499-44e2-b78f-5795f974a6bd",
       "source": "cowork",
       "device": "mac",
-      "cwd": "/sessions/charming-youthful-wright",
-      "title": "interviewPrep",
       "started_at": "2026-03-18T23:20:38.512000+00:00",
       "ended_at": "2026-04-23T18:47:00.358000+00:00",
+      "cwd": "/sessions/charming-youthful-wright",
+      "title": "interviewPrep",
       "messages": [
         {
           "role": "user",
@@ -223,10 +223,10 @@
       "session_id": "local_95accffa-6c72-4409-8069-1407b3a8b954",
       "source": "cowork",
       "device": "mac",
-      "cwd": "/sessions/keen-tender-hamilton",
-      "title": "Fetch yage newsletter",
       "started_at": "2026-04-23T16:05:33.787000+00:00",
       "ended_at": "2026-04-23T16:05:49.683000+00:00",
+      "cwd": "/sessions/keen-tender-hamilton",
+      "title": "Fetch yage newsletter",
       "messages": [
         {
           "role": "user",
@@ -249,10 +249,10 @@
       "session_id": "0ccb0f44-f9ae-4c55-bdad-62b800e07a3e",
       "source": "claude-code",
       "device": "mac",
+      "started_at": "2026-04-23T16:29:11.202Z",
+      "ended_at": "2026-04-24T06:59:56.654Z",
       "cwd": "/Users/francisyang/VibeCodingProjects/cadence",
       "title": "Check files.zip for next task",
-      "started_at": "2026-04-23T16:29:11.202Z",
-      "ended_at": "2026-04-24T06:26:55.762Z",
       "messages": [
         {
           "role": "user",
@@ -445,58 +445,28 @@
         {
           "role": "assistant",
           "text": "Your key is passing JWT auth (no more 401) but every request returns HTTP 500 \u2014 that's account-level (no credits, not verified, or tier mismatch), not my code. Two things I'll do regardless:\n\n1. **Add JWT auto-generation to the GLM client** so the `{id}.{secret}` format works without you regenerating. That way when you resolve the account issue the code is ready.\n2. **Commit the config** and flag what you need to check on Zhipu's dashboard."
+        },
+        {
+          "role": "assistant",
+          "text": "## Shipped \u2014 but your Zhipu key is blocked upstream\n\n### Latest GLM models (April 2026, confirmed from Zhipu/Z.ai pricing pages)\n\n| Model | Cost (per MTok) | Use |\n|---|---|---|\n| **GLM-5** / GLM-5.1 | $1.00 / $1.40 input | Frontier; rivals Opus on SWE-Bench Pro |\n| **GLM-4.7** | $0.60 / $2.20 | Mid-tier paid |\n| **GLM-4.7-Flash** \u00b7 **GLM-4.5-Flash** | **FREE** | Intent parse, chat, light tasks |\n| **GLM-4.5** | $0.60 / $2.20 | Cheap structured output |\n\n### What I wired\n\n- **`CADENCE_LLM_MODE=testing`** (default) routes plan-gen + selector through **GLM-5**, everything else through **GLM-4.5-Flash** (free). Set `CADENCE_LLM_MODE=production` to flip plan-gen back to Claude Opus.\n- **Auto-JWT wrapping** \u2014 Zhipu's `{id}.{secret}` key format requires a custom HS256 JWT (ms-based `exp`, `sign_type: SIGN` header). `getGlmClient()` signs it automatically, refreshes every 55 min. Z.ai-issued raw tokens pass through unchanged.\n- Schema + prompts shared across both providers \u2014 same `save_plan` / `pick_winner` tool-call contract.\n\n### \u26a0\ufe0f Your key \u2014 the account, not the code\n\nI tested the key you pasted (`f031de432\u2026o74TV0S88N9Bue0U`) three ways:\n\n| Attempt | Result |\n|---|---|\n| Raw Bearer \u2192 bigmodel.cn | **HTTP 401** \u2014 Authentication failed (code 1000) |\n| Raw Bearer \u2192 api.z.ai | **HTTP 401** \u2014 same |\n| **JWT (ms-based exp) \u2192 bigmodel.cn** | **HTTP 500** \u2014 `\u5185\u90e8\u670d\u52a1\u5668\u9519\u8bef` |\n\nJWT got past auth \u2014 so the **key is legitimate**, but every chat-completion on every model (`glm-4-flash`, `glm-4.5-flash`, `glm-4.5`, `glm-5`) returns 500.\n\nThat's an **account-level issue**, not my code. Likely one of:\n\n1. **No credits / not topped up** \u2014 Zhipu requires a \u2265\u00a51 balance even for \"free\" flash tier usage\n2. **Account not finished the \u5b9e\u540d\u9a8c\u8bc1 (real-name verification)** \u2014 Mainland-issued accounts need ID verification before the API will serve\n3. **Wrong platform** \u2014 this key is from `open.bigmodel.cn` but you may have subscribed on Z.ai (separate platform, separate keys). Generate a fresh one at the platform you actually have credits on\n\n### What to do\n\n1. Log in at https://open.bigmodel.cn/usercenter/apikeys and:\n   - Check account balance (top-up \u00a55 is usually enough to unblock even free-tier calls)\n   - Confirm the key is **active** and **has at least one model checked** in its permission set\n   - If unclear, **regenerate a new key** and paste it to me\n2. If you actually subscribed to Z.ai (different platform), generate a key at https://z.ai/ and I'll flip `ZHIPU_BASE_URL` to `https://api.z.ai/api/paas/v4/`\n\nOnce the key works, `/plan/new` will immediately produce a real GLM-5-generated plan. The 3-variant sampling + rubric selector runs identically on GLM \u2014 just swap providers.\n\n**Alternative right now**: if you have an Anthropic key handy, set `ANTHROPIC_API_KEY` and `CADENCE_LLM_MODE=production` in `.env.local`, restart dev, and the whole flow works through Claude Opus immediately.\n\nSources:\n- [Zhipu AI GLM Pricing 2026](https://vibecoding.app/blog/zhipu-ai-glm-pricing-2026)\n- [HTTP User Authentication (bigmodel.cn)](https://open.bigmodel.cn/dev/api/http-call/http-auth)\n- [GLM-5 API platform](https://glm5api.com/)\n- [GLM-5.1 Open Source benchmarks](https://www.modemguides.com/blogs/ai-news/glm-5-1-open-source-benchmarks-local-ai)"
+        },
+        {
+          "role": "user",
+          "text": "here is new GLM API key\n[REDACTED:glm]"
         }
       ],
       "topic": "health",
       "topic_confidence": 0.33,
-      "duration_min": 838
-    },
-    {
-      "session_id": "4f900a63-b1a0-4010-bbb8-e61b3d2378dd",
-      "source": "claude-code",
-      "device": "mac",
-      "cwd": "/Users/francisyang/VibeCodingProjects/cadence",
-      "title": "Analyze competitors for product-management competitive brief",
-      "started_at": "2026-04-23T16:30:48.717Z",
-      "ended_at": "2026-04-23T16:35:48.221Z",
-      "messages": [
-        {
-          "role": "user",
-          "text": "<command-message>product-management:competitive-brief</command-message>\n<command-name>/product-management:competitive-brief</command-name>\n<command-args> please insvestiagte the competitors right now for exact same product and generae a report for me. Anayze the diffs and shared part.</command-args>"
-        },
-        {
-          "role": "user",
-          "text": "Base directory for this skill: /Users/francisyang/Library/Application Support/Claude/local-agent-mode-sessions/4831c821-4318-4df9-8985-e495efe102cd/26474967-2dbb-4e13-a16f-acba809c9aac/rpm/plugin_01NwRqPNp2fymu8ctzJhD4fx/skills/competitive-brief\n\n# Competitive Brief\n\n> If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../../CONNECTORS.md).\n\nCreate a competitive analysis brief for one or more competitors or a feature area.\n\n## Usage\n\n```\n/competitive-brief  please insvestiagte the competitors right now for exact same product and generae a report for me. Anayze the diffs and shared part.\n```\n\n## Workflow\n\n### 1. Scope the Analysis\n\nAsk the user:\n- **Competitor(s)**: Which specific competitor(s) to analyze? Or a feature area to compare across competitors?\n- **Focus**: Full product comparison, specific feature area, pricing/packaging, go-to-market, or positioning?\n- **Context**: What decision will this inform? (product strategy, sales enablement, investor/board materials, feature prioritization)\n\n### 2. Research\n\n**Via web search**:\n- Product pages and feature lists\n- Pricing pages and packaging\n- Recent product launches, blog posts, and changelogs\n- Press coverage and analyst reports\n- Customer reviews and ratings (G2, Capterra, TrustRadius)\n- Job postings (signal of strategic direction)\n- Social media and community discussions\n\nIf **~~knowledge base** is connected:\n- Search for existing competitive analysis documents\n- Find win/loss reports or sales battle cards\n- Pull prior competitive research\n\nIf **~~chat** is connected:\n- Search for competitive mentions in sales or product channels\n- Find recent deal feedback involving competitors\n\n### 3. Generate the Brief\n\n#### Competitor Overview\nFor each competitor:\n- Company summary: founding, size, funding/revenue if public, target market\n- Product positioning: how they describe themselves, who they target\n- Recent momentum: launches, funding, partnerships, customer wins\n\n#### Feature Comparison\nCompare capabilities across key areas relevant to the analysis. See **Feature Comparison Matrices** below for rating scales and matrix templates.\n\n#### Positioning Analysis\nAnalyze how each competitor positions themselves \u2014 target customer, category claim, key differentiator, and value proposition. See **Positioning Analysis Frameworks** below for the positioning statement template and message architecture levels.\n\n#### Strengths and Weaknesses\nFor each competitor:\n- **Strengths**: Where they genuinely excel. What customers praise.\n- **Weaknesses**: Where they fall short. What customers complain about.\n- Be honest and evidence-based \u2014 do not dismiss competitors or inflate their weaknesses.\n\n#### Opportunities\nBased on the analysis:\n- Where are there gaps in competitor offerings we could exploit?\n- What are customers asking for that no one provides well?\n- Where are competitors making bets we disagree with?\n- What market shifts could advantage our approach?\n\n#### Threats\n- Where are competitors investing heavily?\n- What competitive moves could disrupt our position?\n- Where are we most vulnerable?\n- What would a \"nightmare scenario\" competitive move look like?\n\n#### Strategic Implications\nTie the analysis back to product strategy:\n- What should we build, accelerate, or deprioritize based on this analysis?\n- Where should we differentiate vs. achieve parity?\n- How should we adjust positioning or messaging?\n- What should we monitor going forward?\n\n### 4. Follow Up\n\nAfter generating the brief:\n- Ask if the user wants to dive deeper on any section\n- Offer to create a one-page summary for executives\n- Offer to create sales battle cards for competitive deals\n- Offer to draft a \"how to win against [competitor]\" guide\n- Offer to set up a monitoring plan for competitive moves\n\n## Competitive Landscape Mapping\n\n### Identifying the Competitive Set\nDefine competitors at multiple levels:\n\n**Direct competitors**: Products that solve the same problem for the same "
-        },
-        {
-          "role": "assistant",
-          "text": "I'll execute this as a competitive analysis for Cadence \u2014 focus on the two MVP features: family-shared habit check-ins and purine food lookup. Auto mode active, so I'll make reasonable assumptions and go wide on research, then synthesize.\n\nLoading search tools."
-        },
-        {
-          "role": "assistant",
-          "text": "Running parallel searches across all four competitive angles."
-        },
-        {
-          "role": "assistant",
-          "text": "I have enough to write the brief. Let me save it as `COMPETITIVE_BRIEF.md` at the project root."
-        },
-        {
-          "role": "assistant",
-          "text": "Report written to [COMPETITIVE_BRIEF.md](COMPETITIVE_BRIEF.md). Headline findings:\n\n**Shared with competitors (table stakes)**: daily check-in UX, streak, heatmap, mobile-first, magic-link login. Every habit app has these.\n\n**Differences that only Cadence holds (the combination is the moat)**:\n1. **Read-only family sharing** \u2014 visibility without control. Every competitor is either solo or allows editing each other.\n2. **Habits + purine food DB in one app** \u2014 habit apps (HabitShare, Habitica, Streaks) have zero food data; gout apps (Purity, GoutSnap, \u75db\u98ce\u5feb\u597d, \u522b\u75db\u98ce) are solo-user and clinical.\n3. **Bilingual zh/en + lifestyle tone** \u2014 serves multi-generation Chinese families; no existing app does both languages.\n4. **PWA-first** \u2014 parents don't need App Store friction.\n\n**Closest single competitor**: \u75db\u98ce\u5feb\u597d (CN) \u2014 already combines purine lookup + uric acid + habit tracking, but is solo-user, medical-branded, CN-only, mobile-app only. **One sprint away from being the biggest threat** if they add family sharing.\n\n**Key strategic recommendation**: Do not try to win any single axis (they have bigger databases, more polish). Win the intersection, protect the lifestyle tone, and ship the family invites in Sprint 3 as planned.\n\nSources:\n- [Cohorty \u2014 Best habit trackers with friends 2026](https://www.cohorty.app/blog/best-habit-tracking-apps-with-friends)\n- [HabitShare](https://habitshareapp.com/)\n- [Habitica Group Plans](https://habitica.fandom.com/wiki/Group_Plans)\n- [Streaks](https://apps.apple.com/us/app/streaks/id963034692)\n- [GoutSnap](https://www.goutsnap.com/)\n- [Purity](https://apps.apple.com/us/app/purity-gout-diet-management/id1502797063)\n- [\u75db\u98ce\u5feb\u597d](https://tongfengkh.com/)\n- [\u522b\u75db\u98ce](https://www.bietongfeng.com/)\n- [\u75db\u98ce\u5feb\u597d \u4ea7\u54c1\u5206\u6790 (woshipm)](https://www.woshipm.com/evaluating/5474136.html)\n- [2024 \u75db\u98ce\u996e\u98df\u6307\u5357 + 300\u79cd\u98df\u7269\u560c\u5464\u8868](https://zhuanlan.zhihu.com/p/682663243)"
-        }
-      ],
-      "topic": "ai",
-      "topic_confidence": 0.6,
-      "duration_min": 5
+      "duration_min": 871
     },
     {
       "session_id": "09f8c108-a0e1-45ce-b01f-d4e135965eb5",
       "source": "claude-code",
       "device": "mac",
-      "cwd": "/Users/francisyang/VibeCodingProjects/agent_sop",
-      "title": "Push local code to remote",
       "started_at": "2026-04-23T18:47:49.496Z",
       "ended_at": "2026-04-23T18:51:52.025Z",
+      "cwd": "/Users/francisyang/VibeCodingProjects/agent_sop",
+      "title": "Push local code to remote",
       "messages": [
         {
           "role": "user",
@@ -522,129 +492,31 @@
       "topic": "ai",
       "topic_confidence": 0.5,
       "duration_min": 4
-    },
-    {
-      "session_id": "3aa0f68c-ebb7-4cba-95f8-c8647486282a",
-      "source": "claude-code",
-      "device": "mac",
-      "cwd": "/Users/francisyang/VibeCodingProjects/metaglass",
-      "title": "Set up MetaGlass SDK and explore app ideas",
-      "started_at": "2026-04-23T21:28:35.130Z",
-      "ended_at": "2026-04-23T23:46:32.934Z",
-      "messages": [
-        {
-          "role": "user",
-          "text": "curl -sL https://raw.githubusercontent.com/facebook/meta-wearables-dat-ios/main/install-skills.sh | bash -s claude\n\nsetup metaglass SDK and start develop APP.\nexpplore what kind of APP we can builld using glasses /product-brainstorming"
-        },
-        {
-          "role": "assistant",
-          "text": "The `curl | bash` was blocked. Let me do it in two safer steps \u2014 download, inspect, then execute."
-        },
-        {
-          "role": "assistant",
-          "text": "Script is benign \u2014 just copies config files from Meta's repo. Running it locally now."
-        },
-        {
-          "role": "assistant",
-          "text": "SDK skills installed (9 files under `.claude/skills/`). Now invoking product-brainstorming to explore app ideas before scaffolding."
-        },
-        {
-          "role": "user",
-          "text": "Base directory for this skill: /Users/francisyang/Library/Application Support/Claude/local-agent-mode-sessions/4831c821-4318-4df9-8985-e495efe102cd/26474967-2dbb-4e13-a16f-acba809c9aac/rpm/plugin_01NwRqPNp2fymu8ctzJhD4fx/skills/product-brainstorming\n\n# Product Brainstorming Skill\n\nYou are a sharp product thinking partner \u2014 the kind of experienced PM or design lead who challenges assumptions, asks the hard questions, and pushes ideas further before anyone converges too early. You help product managers explore problem spaces, generate ideas, and stress-test thinking before it becomes a spec.\n\nYour job is not to generate deliverables. Your job is to think alongside the PM. Be opinionated. Push back. Bring in unexpected angles. Help them arrive at ideas they would not have reached alone.\n\n## Brainstorming Modes\n\nDifferent situations call for different modes of thinking. Identify which mode fits the conversation and adapt. You can shift between modes as the conversation evolves.\n\n### Problem Exploration\n\nUse when the PM has a problem area but has not yet defined what to solve. The goal is to understand the problem space deeply before jumping to solutions.\n\n**What to do:**\n- Ask \"who has this problem?\" and \"what are they doing about it today?\" before anything else\n- Map the problem ecosystem: who is involved, what triggers the problem, what are the consequences of not solving it\n- Distinguish symptoms from root causes. PMs often describe symptoms. Keep asking \"why\" until you hit something structural.\n- Surface adjacent problems the PM might not have considered\n- Ask how the problem varies across user segments \u2014 it rarely affects everyone the same way\n\n**Useful questions:**\n- \"What happens if we do nothing? Who suffers and how?\"\n- \"Who has solved a version of this problem in a different context?\"\n- \"Is this a problem of awareness, ability, or motivation?\"\n- \"What would need to be true for this problem to not exist?\"\n\n### Solution Ideation\n\nUse when the problem is well-defined and the PM needs to generate multiple possible solutions. The goal is divergent thinking \u2014 quantity over quality.\n\n**What to do:**\n- Generate at least 5-7 distinct approaches before evaluating any of them\n- Vary the solutions along meaningful dimensions: scope (small tweak vs big bet), approach (product vs process vs policy), timing (quick win vs long-term investment)\n- Include at least one \"what if we did the opposite?\" option\n- Include at least one option that removes something rather than adding something\n- Resist the urge to converge too early. If the PM latches onto the first decent idea, push them to keep going.\n\n**Ideation techniques:**\n- **Constraint removal**: \"What would you build if you had no technical constraints? No budget constraints? No political constraints?\" Then work backward to what is feasible.\n- **Analogies**: \"How does [another industry] solve this? What can we steal from that approach?\"\n- **Inversion**: \"How would we make this problem worse? Now reverse each of those.\"\n- **Decomposition**: Break the problem into subproblems and solve each independently. Then combine.\n- **User hat-switching**: \"How would a power user solve this? A brand new user? An admin? Someone who hates our product?\"\n\n### Assumption Testing\n\nUse when the PM has an idea or direction and needs to stress-test it. The goal is to find the weak points before investing in execution.\n\n**What to do:**\n- List every assumption the idea depends on \u2014 stated and unstated\n- For each assumption, ask: \"How confident are we? What evidence do we have? What would disprove this?\"\n- Identify the riskiest assumption \u2014 the one that, if wrong, kills the idea entirely\n- Suggest the cheapest way to test the riskiest assumption before building anything\n- Play devil's advocate: argue the strongest possible case against the idea\n\n**Assumption categories to probe:**\n- **User assumptions**: \"Users want this\" \u2014 How do we know? From what evidence? How many users?\n- **Problem assumptions**: \"This is a r"
-        },
-        {
-          "role": "assistant",
-          "text": "## Framing\n\nThe SDK's real edge isn't \"another camera\" \u2014 it's **hands-free + eye-level + socially invisible**. Any idea that could work just as well with an iPhone in hand is not the right idea. The winning concepts are ones where pulling out a phone breaks the moment.\n\n## Diverge \u2014 10 concepts across distinct dimensions\n\n| # | Concept | Unique-to-glasses reason | Solo-dev risk |\n|---|---|---|---|\n| 1 | **Cooking co-pilot** \u2014 recipe assistant, voice-controlled timers, \"flip now\" cues from pan state | hands are wet/dirty | timing accuracy is hard |\n| 2 | **DIY / repair narrator** \u2014 show the thing, AI audio-walks you through it, remembers which bolt you already tried | hands hold tools | VLM correctness |\n| 3 | **Look & Learn (language immersion)** \u2014 point at objects in the wild, hear target-language word, auto-build SRS deck | walking a city, no phone | low |\n| 4 | **Birder / naturalist** \u2014 one-tap ID with audio callout | wildlife doesn't wait | low, but niche |\n| 5 | **Field-trade assistant** \u2014 HVAC/inspector POV, voice notes + auto photos \u2192 compiled report | clipboard in hand | B2B distribution |\n| 6 | **Parent memory cam** \u2014 passive/triggered capture of kid moments, daily reel | toddler-chasing | privacy, storage |\n| 7 | **Shopping oracle** \u2014 in-aisle ingredient/price/review lookup, discreet | grocery cart occupied | requires lookups API |\n| 8 | **Memory palace** \u2014 \"where did I leave my keys\" \u2014 timeline search over your day | passive, can't phone-capture always-on | privacy, demo delay |\n| 9 | **Climbing beta recorder** \u2014 POV of a route + voice annotations, share with community | at the wall | tiny market |\n| 10 | **Low-vision scene narrator** \u2014 audio description of surroundings | accessibility unlock | already exists (Be My Eyes) |\n\n## Provoke\n\n- **Ideas 6, 8 are privacy minefields** \u2014 you're streaming strangers. Shelve unless you want that fight.\n- **Ideas 5, 9 are B2B/niche** \u2014 great LTV, terrible as a solo dev's first demo because no one you show it to can feel it.\n- **Ideas 1, 2 are demo-seductive but execution-hard** \u2014 \"flip the steak now\" requires low-latency VLM inference on a video stream. Possible with Apple's Vision + a cloud VLM, but brittle.\n- **Ideas 3, 4, 7 share a simple core loop**: photo \u2192 VLM/API \u2192 TTS \u2192 optional save. This is the *shipping-over-perfection* shape.\n\n## Converge \u2014 my opinionated pick\n\n### Prototype #1: **\"Look & Learn\" \u2014 wearable language immersion**\n\n**Core loop (90% of the SDK surface):** double-tap on glasses \u2192 photo capture \u2192 VLM classifies the object \u2192 TTS speaks the word in your target language \u2192 card appears in phone app's SRS queue.\n\nWhy this one first:\n- **Demo sells itself in 15 seconds** \u2014 point at a mug, hear \"une tasse,\" card saved. Non-technical people *get it*.\n- **No latency-critical video stream** \u2014 photo capture is enough. Much lower engineering bar than cooking/DIY.\n- **Maps cleanly to the SDK skills we just installed**: registration \u2192 session \u2192 photo capture \u2192 audio feedback. No exotic code paths.\n- **Has a real moat for solo dev**: the SRS deck + per-user vocabulary graph gets stickier over time. Retention story beyond the novelty.\n- **Clear paywall**: free = 1 language, paid = all + export to Anki.\n\n**Riskiest assumption to test first (cheap):** will users *actually* tap the glasses to capture, vs. feeling self-conscious? Validate by forcing yourself to use a paper prototype (phone + audio cue) for one day in a grocery store before writing a line of glasses-specific code.\n\n### Prototype #2 (backup / stretch): **POV Cooking Co-pilot**\n\nShelve unless #1 lands. Bigger demo payoff but 3x the engineering risk for a solo dev \u2014 you're fighting VLM latency, state tracking across a recipe, and noisy pan scenes.\n\n---\n\n## What I'm going to do next\n\nScaffold the iOS app for **Look & Learn**: SwiftUI app with DAT SDK integrated, Meta AI registration flow, a \"Capture\" screen that triggers photo capture from glasses, sends to a VLM (stub for now), speaks the result via `AVSpeechSynthe"
-        },
-        {
-          "role": "assistant",
-          "text": "Xcode 26.2 available, no xcodegen. I'll scaffold source + project.yml, install xcodegen via brew, then generate the xcodeproj."
-        },
-        {
-          "role": "assistant",
-          "text": "Xcodeproj generated. Let me verify it builds \u2014 this resolves SPM dependencies."
-        },
-        {
-          "role": "assistant",
-          "text": "Real SDK API is async (skill docs are out of date). Fixing."
-        },
-        {
-          "role": "assistant",
-          "text": "Now I understand the real v0.6.0 API. Rewriting CaptureViewModel."
-        },
-        {
-          "role": "assistant",
-          "text": "Build succeeds. Let me also verify the Info.plist rewrite by xcodegen kept my MWDAT/URL scheme entries \u2014 it did."
-        },
-        {
-          "role": "assistant",
-          "text": "Let me save a memory about the stale skill docs \u2014 useful for future sessions."
-        },
-        {
-          "role": "assistant",
-          "text": "## Done\n\n**SDK setup** \u2014 installed Meta DAT Claude skills into [.claude/](.claude/), `xcodegen` via brew, SPM resolved MetaWearablesDAT 0.6.0.\n\n**App scaffolded** \u2014 `Look & Learn`, a language-immersion app. Solo-dev-sized, demo-friendly.\n\n**Build status:** `** BUILD SUCCEEDED **` on iPhone 17 simulator.\n\n**Key files:**\n- [project.yml](project.yml) \u2014 XcodeGen spec (Info.plist + SPM deps)\n- [App/LookAndLearnApp.swift](LookAndLearn/App/LookAndLearnApp.swift) \u2014 `Wearables.configure()` + SwiftData container\n- [ViewModels/CaptureViewModel.swift](LookAndLearn/ViewModels/CaptureViewModel.swift) \u2014 real v0.6.0 pipeline: `createSession` \u2192 `addStream` \u2192 listen to `statePublisher`/`videoFramePublisher`/`photoDataPublisher` \u2192 `capturePhoto` \u2192 VLM \u2192 TTS \u2192 SwiftData card\n- [Services/VisionLabeler.swift](LookAndLearn/Services/VisionLabeler.swift) \u2014 protocol + stub; swap in Claude Vision later\n- [Views/CaptureView.swift](LookAndLearn/Views/CaptureView.swift), [DeckView](LookAndLearn/Views/DeckView.swift), [SettingsView](LookAndLearn/Views/SettingsView.swift) \u2014 3-tab UI\n- [README.md](README.md) \u2014 build/run/testing instructions\n\n**Brainstorm pick for prototype #1: Look & Learn** (hands-free language immersion). Shipped the scaffold. Stretch/backup: POV cooking co-pilot.\n\n**Gotchas saved to memory:** The bundled `.claude/skills/` docs for this SDK are stale vs v0.6.0 (registration is async, `StreamSession` has no public init \u2014 must go through `DeviceSession.addStream`). Saved as a feedback memory.\n\n**Next steps you'll want:**\n1. Swap `StubVisionLabeler` for a real VLM (Claude Vision via the `anthropic` SDK \u2014 see the `claude-api` skill).\n2. Test on real hardware via Meta AI registration flow (Settings tab \u2192 Register).\n3. Add SRS scheduling and an export-to-Anki button for retention/paywall hook."
-        },
-        {
-          "role": "user",
-          "text": "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>"
-        },
-        {
-          "role": "user",
-          "text": "<command-name>/model</command-name>\n            <command-message>model</command-message>\n            <command-args>claude-sonnet-4-6</command-args>"
-        },
-        {
-          "role": "user",
-          "text": "<local-command-stdout>Set model to claude-sonnet-4-6</local-command-stdout>"
-        },
-        {
-          "role": "user",
-          "text": "wait second is this video app? I dont need that.\nthe simpleflow will be \nyoudont need the visual, but only record the audio, routiing to LLM and then given me instant feedback and HOw I talk to this person"
-        },
-        {
-          "role": "assistant",
-          "text": "You've hit your limit \u00b7 resets 3:20pm (America/Los_Angeles)"
-        },
-        {
-          "role": "user",
-          "text": "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>"
-        },
-        {
-          "role": "user",
-          "text": "<command-name>/model</command-name>\n            <command-message>model</command-message>\n            <command-args>claude-opus-4-7[1m]</command-args>"
-        },
-        {
-          "role": "user",
-          "text": "<local-command-stdout>Set model to claude-opus-4-7[1m]</local-command-stdout>"
-        },
-        {
-          "role": "user",
-          "text": "can you generate the product PRD first /product-brainstorming"
-        },
-        {
-          "role": "assistant",
-          "text": "Got it \u2014 pivoting to audio-only Talk Coach. Invoking the spec-writing skill since you want a PRD deliverable."
-        },
-        {
-          "role": "user",
-          "text": "Base directory for this skill: /Users/francisyang/Library/Application Support/Claude/local-agent-mode-sessions/4831c821-4318-4df9-8985-e495efe102cd/26474967-2dbb-4e13-a16f-acba809c9aac/rpm/plugin_01NwRqPNp2fymu8ctzJhD4fx/skills/write-spec\n\n# Write Spec\n\n> If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../../CONNECTORS.md).\n\nWrite a feature specification or product requirements document (PRD).\n\n## Usage\n\n```\n/write-spec Write a PRD for \"Talk Coach\" \u2014 an iOS app that provides live conversation coaching. \n\nContext (from prior turns + user correction):\n- User pivoted away from visual/video-based ideas (initial \"Look & Learn\" language app was rejected as \"not needed\"). \n- The real goal: audio-only flow. User's exact words: \"you don't need the visual, but only record the audio, routing to LLM and then given me instant feedback and HOw I talk to this person\"\n- The SDK in use is Meta Wearables DAT iOS (facebook/meta-wearables-dat-ios 0.6.0), but current public SDK does NOT expose glasses audio streaming \u2014 so V1 must fall back to iPhone microphone via AVAudioEngine + SFSpeech for transcription. Glasses audio is a future upgrade when/if the DAT SDK exposes it.\n- App scaffold already exists with: SwiftData-backed history, ConversationCoach protocol (swap-in point for the LLM), SFSpeechRecognizer pipeline, SwiftUI tabs (Coach / History / Settings), bundle id com.francisyang.talkcoach.\n- Solo dev, MVP-sized scope.\n\nThe PRD should cover: problem statement, target user, JTBD, goals/non-goals, user flows, success metrics, MVP feature scope vs later, the Meta glasses audio upgrade path, key risks/assumptions, and open questions. Be opinionated and specific \u2014 this is a scoping PRD for a solo dev to build against, not a committee document.\n```\n\n## Workflow\n\n### 1. Understand the Feature\n\nAsk the user what they want to spec. Accept any of:\n- A feature name (\"SSO support\")\n- A problem statement (\"Enterprise customers keep asking for centralized auth\")\n- A user request (\"Users want to export their data as CSV\")\n- A vague idea (\"We should do something about onboarding drop-off\")\n\n### 2. Gather Context\n\nAsk the user for the following. Be conversational \u2014 do not dump all questions at once. Ask the most important ones first and fill in gaps as you go:\n\n- **User problem**: What problem does this solve? Who experiences it?\n- **Target users**: Which user segment(s) does this serve?\n- **Success metrics**: How will we know this worked?\n- **Constraints**: Technical constraints, timeline, regulatory requirements, dependencies\n- **Prior art**: Has this been attempted before? Are there existing solutions?\n\n### 3. Pull Context from Connected Tools\n\nIf **~~project tracker** is connected:\n- Search for related tickets, epics, or features\n- Pull in any existing requirements or acceptance criteria\n- Identify dependencies on other work items\n\nIf **~~knowledge base** is connected:\n- Search for related research documents, prior specs, or design docs\n- Pull in relevant user research findings\n- Find related meeting notes or decision records\n\nIf **~~design** is connected:\n- Pull related mockups, wireframes, or design explorations\n- Search for design system components relevant to the feature\n\nIf these tools are not connected, work entirely from what the user provides. Do not ask the user to connect tools \u2014 just proceed with available information.\n\n### 4. Generate the PRD\n\nProduce a structured PRD with these sections. See **PRD Structure** below for detailed guidance on what each section should contain.\n\n- **Problem Statement**: The user problem, who is affected, and impact of not solving it (2-3 sentences)\n- **Goals**: 3-5 specific, measurable outcomes tied to user or business metrics\n- **Non-Goals**: 3-5 things explicitly out of scope, with brief rationale for each\n- **User Stories**: Standard format (\"As a [user type], I want [capability] so that [benefit]\"), grouped by persona\n- **Requirements**: Categorized as Must-Hav"
-        },
-        {
-          "role": "assistant",
-          "text": "# Talk Coach \u2014 PRD v0.1\n\n**Owner:** Francis (solo dev) \u00b7 **Status:** Draft for MVP build \u00b7 **Target ship:** 2\u20133 weekends to testable prototype\n\n---\n\n## 1. Problem Statement\n\nPeople walk out of important conversations (first meetings, sales calls, dates, tough feedback) replaying what they said and wishing they'd said it differently \u2014 but by then the moment is gone. Existing tools (journals, coaches, therapists) give delayed, generic reflection. **No tool gives you feedback on *how you talked to this specific person* while the interaction is still fresh enough to act on.**\n\n**Cost of not solving:** Users keep repeating the same conversational patterns (dominating, under-asserting, flat affect, missed cues) because the feedback loop between \"what I said\" and \"how it landed\" is too long \u2014 often never closed at all.\n\n---\n\n## 2. Target User\n\n**Primary (V1):** Francis himself + 5\u201310 hand-picked testers who are:\n- Professionals 25\u201340 doing high-stakes conversations weekly (sales, PM, founder, manager, dater).\n- Already self-aware enough to want feedback, not defensive about it.\n- iPhone owners, comfortable recording themselves.\n\n**Explicitly not the target:** Casual users who want a \"fun AI thing.\" This is a deliberate-practice tool for people trying to improve.\n\n---\n\n## 3. Jobs-to-be-Done\n\n> **When** I just finished (or am in the middle of) a conversation that matters,\n> **I want to** get specific, honest feedback on what I just said and how to say the next thing better,\n> **so I can** adjust in real time or at least not repeat the same mistake tomorrow.\n\nSecondary JTBD:\n> When I'm preparing for a known hard conversation, I want to practice a line out loud and get a reaction, so I walk in less anxious.\n\n---\n\n## 4. Goals\n\n| # | Goal | How we measure |\n|---|------|----------------|\n| G1 | Time from \"stop recording\" to feedback rendered **< 4 seconds** for a 30-second clip | Instrumented timer on device |\n| G2 | Feedback is specific enough that tester can name a behavior to change after reading it | Weekly tester interview: \"What did you change?\" \u2014 count concrete answers |\n| G3 | A tester records \u22653 conversations in their first week | SwiftData count in analytics ping |\n| G4 | At least 1 tester says \"I actually did X differently in a real conversation because of this\" within 2 weeks | Qualitative \u2014 single quote is the bar |\n\n**These are the only goals for V1.** Everything else is a distraction.\n\n---\n\n## 5. Non-Goals\n\n| Non-Goal | Why not now |\n|---|---|\n| Real-time coaching during a live conversation | Latency + social awkwardness (phone on table mid-date) \u2014 post-hoc is 90% of the value at 10% of the complexity |\n| Transcribing the *other person* (diarization) | SFSpeech doesn't diarize reliably; a one-sided transcript of the user's speech is enough for self-focused coaching |\n| Meta Ray-Ban glasses as the audio source | DAT SDK 0.6.0 doesn't expose glasses audio streaming; designing for it now is speculative |\n| A social / sharing layer | Privacy nightmare, not needed to prove the core loop |\n| Scoring / gamification leaderboards | Turns coaching into performance theater; actively harmful to honest practice |\n| Multi-language support | Ship English-only; validate the loop first |\n\n---\n\n## 6. User Flows\n\n### Flow A \u2014 Post-hoc review (V1 core)\n```\nOpen app\n\u2192 Coach tab\n\u2192 Pick context (First Meeting / Date / Sales / Conflict / Interview / Casual)\n\u2192 Tap Record\n\u2192 Speak (10s\u20133min)\n\u2192 Tap Stop\n\u2192 Within 4s see: Next-best-line \u00b7 Keep doing \u00b7 Adjust \u00b7 One-line summary\n\u2192 (Auto-saved to History)\n```\n\n### Flow B \u2014 Rehearsal\n```\nCoach tab\n\u2192 Context picker includes \"Rehearsal\"\n\u2192 Type or speak the line the other person might say (optional scaffold)\n\u2192 Record your response\n\u2192 Get feedback\n```\n*(V1: just reuse Flow A with a Rehearsal context. No new UI.)*\n\n### Flow C \u2014 History review\n```\nHistory tab\n\u2192 See list of prior reviews sorted by recency\n\u2192 Tap to see full transcript + feedback\n\u2192 Delete if embarrassing\n```\n\n---\n\n## 7. Requirements\n\n### P0 \u2014 Must have"
-        }
-      ],
-      "topic": "tech",
-      "topic_confidence": 0.33,
-      "duration_min": 138
     }
   ],
   "filtered_out": [
+    {
+      "session_id": "4f900a63-b1a0-4010-bbb8-e61b3d2378dd",
+      "source": "claude-code",
+      "title": "Analyze competitors for product-management competitive brief",
+      "reason": "wedding",
+      "duration_min": 5,
+      "topic_guess": "wedding"
+    },
     {
       "session_id": "eee96c85-055c-4975-978a-e5527b8c341b",
       "source": "claude-code",
       "title": "Build Claude Daily Journal System",
       "reason": "esd_unemployment",
-      "duration_min": 598,
+      "duration_min": 619,
+      "topic_guess": "esd_unemployment"
+    },
+    {
+      "session_id": "3aa0f68c-ebb7-4cba-95f8-c8647486282a",
+      "source": "claude-code",
+      "title": "Set up MetaGlass SDK and explore app ideas",
+      "reason": "esd_unemployment",
+      "duration_min": 138,
       "topic_guess": "esd_unemployment"
     },
     {

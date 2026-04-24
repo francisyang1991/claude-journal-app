@@ -201,6 +201,23 @@ def main() -> int:
     out_path = DATA_DIR / "day.json"
     out_path.write_text(json.dumps(day, indent=2))
     print(f"[synthesize] wrote {out_path}", file=sys.stderr)
+
+    # Archive to data/history/ so thread builder has a stable multi-day source.
+    # data/day.json always reflects "most recent day processed"; history/ is append-only.
+    hist_dir = DATA_DIR / "history"
+    hist_dir.mkdir(parents=True, exist_ok=True)
+    (hist_dir / f"{args.date}.json").write_text(json.dumps(day, indent=2))
+
+    # Fold into the thread DB. Optional — threads are a layer on top; never fail synth.
+    try:
+        import subprocess
+        subprocess.run(
+            [sys.executable, str(Path(__file__).resolve().parent / "build_threads.py")],
+            check=False,
+        )
+    except Exception as e:
+        print(f"[synthesize] threads build skipped: {e}", file=sys.stderr)
+
     return 0
 
 

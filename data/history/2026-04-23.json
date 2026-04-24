@@ -1,0 +1,146 @@
+{
+  "date": "2026-04-23",
+  "dow": "Thursday",
+  "devices": [
+    {
+      "slug": "mac",
+      "sessions": 4,
+      "lastSync": "11:51"
+    }
+  ],
+  "sessions_total": 8,
+  "sessions_kept": 4,
+  "honest": "Felt scattered but productive across design, code, and prep.",
+  "summary": "Prepped for a tech interview while iterating on AI product design. Pushed code directly to main instead of branching.",
+  "lessons": [
+    "Dedicated failure slides build interview credibility.",
+    "Sidecar UIs keep core products uncluttered.",
+    "Small first actions beat complex onboarding.",
+    "Pushing directly to main saves time but skips review.",
+    "Seed plans must generalize beyond niche use cases."
+  ],
+  "items": [
+    {
+      "topic": "tech",
+      "device": "mac",
+      "source": "cowork",
+      "start": "16:20",
+      "dur": 51566,
+      "title": "interviewPrep",
+      "body": "I was trying to create a 14-slide presentation for a 45-minute project deep dive interview based on the IDG revamp tech design.",
+      "decisions": [
+        "Used dark navy/teal color palette with amber accents",
+        "Structured slides to match interview format: problem \u2192 architecture \u2192 implementation \u2192 evaluation \u2192 impact",
+        "Added dedicated \"Failures, Tradeoffs & Lessons\" slide for self-awareness",
+        "Varied layouts with two-column, comparison tables, stat callouts, and 2x3 grids",
+        "Included version timeline and consumer grid for technical depth"
+      ],
+      "open": [],
+      "artifacts": [
+        "modified: /sessions/charming-youthful-wright/mnt/agent_sop/IDG_Revamp_Deep_Dive.pptx"
+      ],
+      "sensitive": false
+    },
+    {
+      "topic": "ai",
+      "device": "mac",
+      "source": "cowork",
+      "start": "09:05",
+      "dur": 1,
+      "title": "Fetch yage newsletter",
+      "body": "Fetch the latest newsletter from yage-ai.kit.com and save it to my SOP folder.",
+      "decisions": [
+        "Ran the fetch script from the specified directory",
+        "Script successfully discovered and downloaded new posts",
+        "Converted posts to markdown format",
+        "Saved to newsletters/yage-ai/ directory"
+      ],
+      "open": [],
+      "artifacts": [
+        "added: /newsletters/yage-ai/yage-ai-ai-2026-04-22.md"
+      ],
+      "sensitive": false
+    },
+    {
+      "topic": "health",
+      "device": "mac",
+      "source": "claude-code",
+      "start": "09:29",
+      "dur": 871,
+      "title": "Check files.zip for next task",
+      "body": "I wanted to refine the AI goal coach product design based on our session discussion.",
+      "decisions": [
+        "Shape B as the main UI with AI coach as a sidecar",
+        "Use forms for onboarding, not chat",
+        "Start users with a small first action before showing full plan",
+        "Keep one primary plan with optional background habits",
+        "Generalize the seed plan to be universally health-positive"
+      ],
+      "open": [
+        "Need to write the actual PRD document",
+        "Need to conduct competitive analysis for V2",
+        "Need to implement the plan schema and data migration"
+      ],
+      "artifacts": [
+        "modified: COMPETITIVE_BRIEF.md",
+        "added: seed-plan-generalized.md",
+        "deleted: None"
+      ],
+      "sensitive": false
+    },
+    {
+      "topic": "ai",
+      "device": "mac",
+      "source": "claude-code",
+      "start": "11:47",
+      "dur": 4,
+      "title": "Push local code to remote",
+      "body": "I was trying to push my local code to the remote repository.",
+      "decisions": [
+        "Pushed staged changes to remote",
+        "Opted to push directly to `main` instead of a feature branch"
+      ],
+      "open": [],
+      "artifacts": [
+        "modified: path/to/file"
+      ],
+      "sensitive": false
+    }
+  ],
+  "filtered_out": [
+    {
+      "topic": "wedding",
+      "device": "?",
+      "dur": 5
+    },
+    {
+      "topic": "esd_unemployment",
+      "device": "?",
+      "dur": 619
+    },
+    {
+      "topic": "esd_unemployment",
+      "device": "?",
+      "dur": 138
+    },
+    {
+      "topic": "wedding",
+      "device": "?",
+      "dur": 55800
+    }
+  ],
+  "decisions": [
+    "Added 'Failures, Tradeoffs & Lessons' slide",
+    "Shape B as main UI with AI coach as sidecar",
+    "Use forms for onboarding, not chat",
+    "Pushed directly to main instead of feature branch",
+    "Generalized seed plan for universal health use"
+  ],
+  "open_threads": [
+    "Write PRD for AI goal coach V2",
+    "Conduct competitive analysis for V2",
+    "Implement plan schema and data migration"
+  ],
+  "decisions_extra": 11,
+  "open_extra": 0
+}

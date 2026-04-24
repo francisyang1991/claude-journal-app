@@ -118,9 +118,27 @@ function Flag({ label, items, c, mono }) {
   );
 }
 
-function ObsidianReader({ day }) {
+function ObsidianReader({ day, threads }) {
   const [open, setOpen] = React.useState(() => new Set());
   const [filter, setFilter] = React.useState(null);
+
+  // Cross-day active + stale threads, sorted by last-touched descending
+  const liveThreads = React.useMemo(() => {
+    const all = (threads && threads.threads) || [];
+    return all
+      .filter(t => t.state === 'active' || t.state === 'stale')
+      .sort((a, b) => (b.last_touched_on || '').localeCompare(a.last_touched_on || ''));
+  }, [threads]);
+  const liveShown = liveThreads.slice(0, 5);
+  const liveExtra = liveThreads.length - liveShown.length;
+
+  const daysAgo = (iso) => {
+    if (!iso || !day.date) return null;
+    const a = new Date(iso + 'T00:00:00');
+    const b = new Date(day.date + 'T00:00:00');
+    const ms = b - a;
+    return Math.max(0, Math.round(ms / 86400000));
+  };
   const toggle = (k) => {
     const n = new Set(open);
     n.has(k) ? n.delete(k) : n.add(k);
@@ -304,7 +322,54 @@ function ObsidianReader({ day }) {
       <aside style={{
         background: '#ede4d2', borderLeft: '1px solid #d6cbb3', padding: '48px 24px',
       }}>
-        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: 2,
+        {/* Cross-day threads — "Carry over" */}
+        {liveShown.length > 0 && (
+          <>
+            <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: 2,
+              textTransform: 'uppercase', color: '#8c6a3d', marginBottom: 12,
+              display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>Carry over</span>
+              <span style={{ color: '#a89478', textTransform: 'none', letterSpacing: 0, fontSize: 9 }}>
+                ({liveThreads.length} live thread{liveThreads.length === 1 ? '' : 's'})
+              </span>
+            </div>
+            {liveShown.map((t, i) => {
+              const d = daysAgo(t.last_touched_on);
+              const isStale = t.state === 'stale';
+              return (
+                <div key={t.id} style={{
+                  fontFamily: 'Lora, serif', fontSize: 14.5, lineHeight: 1.4, color: '#2a2520',
+                  padding: '8px 0', borderTop: i === 0 ? 'none' : '1px dashed #d6cbb3',
+                  display: 'flex', gap: 8, textWrap: 'pretty',
+                }}>
+                  <span style={{ color: isStale ? '#c26a4a' : '#6a8a5a', flex: '0 0 auto',
+                    fontFamily: 'JetBrains Mono, monospace', fontSize: 12, marginTop: 1 }}>
+                    {isStale ? '○' : '●'}
+                  </span>
+                  <span style={{ flex: 1 }}>
+                    {t.title}
+                    {d !== null && (
+                      <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+                        color: isStale ? '#c26a4a' : '#a89478', marginLeft: 8, letterSpacing: 0.5 }}>
+                        {d === 0 ? 'today' : `${d}d ago`}
+                      </span>
+                    )}
+                  </span>
+                </div>
+              );
+            })}
+            {liveExtra > 0 && (
+              <div style={{ marginTop: 8, fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+                color: '#a89478', letterSpacing: 1 }}>
+                +{liveExtra} more
+              </div>
+            )}
+            <div style={{ marginTop: 28, borderTop: '1px solid #d6cbb3' }} />
+          </>
+        )}
+
+        <div style={{ marginTop: liveShown.length > 0 ? 20 : 0,
+          fontFamily: 'JetBrains Mono, monospace', fontSize: 10, letterSpacing: 2,
           textTransform: 'uppercase', color: '#6a8a5a', marginBottom: 12 }}>
           Decisions made
         </div>
@@ -597,6 +662,7 @@ function EditorialReader({ day }) {
 
 function App() {
   const [day, setDay] = React.useState(null);
+  const [threads, setThreads] = React.useState(null);
   const [err, setErr] = React.useState(null);
   const [view, setView] = React.useState(() => localStorage.getItem('journal_view') || 'obsidian');
 
@@ -609,6 +675,11 @@ function App() {
       .then((r) => { if (!r.ok) throw new Error('no data/day.json — run ./build.sh first'); return r.json(); })
       .then(setDay)
       .catch((e) => setErr(e.message));
+    // Threads are optional — reader still works without memory/threads.json
+    fetch('../memory/threads.json?ts=' + Date.now())
+      .then((r) => r.ok ? r.json() : null)
+      .then(setThreads)
+      .catch(() => {});
   }, []);
 
   if (err) return (
@@ -629,7 +700,7 @@ function App() {
           <button className={view === 'editorial' ? 'active' : ''} onClick={() => setView('editorial')}>A · Editorial</button>
         </div>
       </div>
-      {view === 'editorial' ? <EditorialReader day={day} /> : <ObsidianReader day={day} />}
+      {view === 'editorial' ? <EditorialReader day={day} /> : <ObsidianReader day={day} threads={threads} />}
     </div>
   );
 }
