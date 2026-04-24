@@ -13,7 +13,8 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-import anthropic
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import llm
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW_DIR = ROOT / "raw"
@@ -117,7 +118,6 @@ def parse_sections(text: str) -> dict:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--date", default=datetime.now().strftime("%Y-%m-%d"))
-    ap.add_argument("--model", default="claude-haiku-4-5-20251001")
     ap.add_argument("--limit", type=int, default=0, help="Max sessions to process (0 = all)")
     args = ap.parse_args()
 
@@ -131,7 +131,7 @@ def main() -> int:
     if args.limit:
         sessions = sessions[: args.limit]
 
-    client = anthropic.Anthropic()
+    print(llm.banner(), file=sys.stderr)
 
     enriched = []
     for i, s in enumerate(sessions, 1):
@@ -149,12 +149,7 @@ def main() -> int:
         )
         print(f"[summarize] [{i}/{len(sessions)}] {s.get('title', '')[:60]}", file=sys.stderr)
         try:
-            resp = client.messages.create(
-                model=args.model,
-                max_tokens=600,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            text = "".join(b.text for b in resp.content if hasattr(b, "text"))
+            text = llm.complete(prompt, role="summary", max_tokens=600)
             parsed = parse_sections(text)
             enriched.append({**s, **parsed, "summary_raw": text})
         except Exception as e:

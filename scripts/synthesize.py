@@ -17,6 +17,9 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import llm
+
 ROOT = Path(__file__).resolve().parent.parent
 RAW_DIR = ROOT / "raw"
 DATA_DIR = ROOT / "data"
@@ -107,7 +110,6 @@ def dow(date_str: str) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--date", default=datetime.now().strftime("%Y-%m-%d"))
-    ap.add_argument("--model", default="claude-sonnet-4-6")
     ap.add_argument("--no-llm", action="store_true", help="Skip LLM synthesis; use placeholders")
     args = ap.parse_args()
 
@@ -128,8 +130,7 @@ def main() -> int:
     honest = "—"
     lessons: list[str] = []
     if kept and not args.no_llm:
-        import anthropic
-        client = anthropic.Anthropic()
+        print(llm.banner(), file=sys.stderr)
         blob = build_session_blob(kept)
         prompt = SYNTH_PROMPT.format(
             dow=dow(args.date), date=args.date,
@@ -137,12 +138,7 @@ def main() -> int:
             blob=blob,
         )
         try:
-            resp = client.messages.create(
-                model=args.model,
-                max_tokens=800,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            text = "".join(b.text for b in resp.content if hasattr(b, "text"))
+            text = llm.complete(prompt, role="synth", max_tokens=800)
             import re
             m = re.search(r"\{[\s\S]*\}", text)
             if m:

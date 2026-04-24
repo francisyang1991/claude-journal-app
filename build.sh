@@ -7,11 +7,13 @@ cd "$(dirname "$0")"
 DATE="${1:-$(date +%Y-%m-%d)}"
 echo "==> Building journal for $DATE"
 
-if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
-  echo "WARN: ANTHROPIC_API_KEY not set — summarize/synthesize will skip LLM calls."
+if [ -z "${GLM_API_KEY:-}" ] && [ -z "${ANTHROPIC_API_KEY:-}" ]; then
+  echo "WARN: neither GLM_API_KEY nor ANTHROPIC_API_KEY set — skipping LLM steps."
   NOLLM="--no-llm"
+  SKIP_SUMMARIZE=1
 else
   NOLLM=""
+  SKIP_SUMMARIZE=0
 fi
 
 PY="${PYTHON:-python3}"
@@ -19,7 +21,7 @@ PY="${PYTHON:-python3}"
 echo "--> collect"
 "$PY" scripts/collect.py --date "$DATE"
 
-if [ -z "$NOLLM" ]; then
+if [ "$SKIP_SUMMARIZE" = "0" ]; then
   echo "--> summarize"
   "$PY" scripts/summarize.py --date "$DATE"
 fi

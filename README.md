@@ -21,10 +21,36 @@ cd claude-journal
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
+# Pick a provider (GLM 4.5-flash is currently free):
+export GLM_API_KEY="..."               # Z.AI GLM — glm-4.5-flash + glm-4.5-air
+# OR
+export ANTHROPIC_API_KEY="sk-ant-..."  # Claude — Haiku + Sonnet
+
 # Once you have a private GitHub repo:
 git remote add origin git@github.com:<you>/claude-journal.git
 git push -u origin main
 ```
+
+### LLM provider choice
+
+The synthesis agent is provider-agnostic via `scripts/llm.py`. Pick one:
+
+| Env var | Provider | Endpoint | Per-session (cheap) | Daily (quality) |
+|---|---|---|---|---|
+| `GLM_API_KEY` | Z.AI GLM | `https://api.z.ai/api/paas/v4/` | `glm-4.5-flash` (free tier) | `glm-4.5-air` |
+| `ANTHROPIC_API_KEY` | Anthropic | — | `claude-haiku-4-5-20251001` | `claude-sonnet-4-6` |
+
+Overrides:
+- `LLM_PROVIDER=glm|anthropic` — force provider when both keys set
+- `LLM_MODEL=<name>` — override the model for the current run
+- `GLM_BASE_URL=...` — use the China-facing endpoint (`open.bigmodel.cn`) or a self-hosted one
+- `GLM_THINKING=1` — enable GLM 4.5's thinking mode (off by default; it burns output tokens as reasoning)
+
+GLM 4.5-flash is currently free-tier and produces good enough summaries for per-session extraction. Start with GLM; upgrade to Anthropic if you need better prose on the daily synthesis.
+
+### Secret scrubbing
+
+The collector regex-redacts common API-key patterns (`sk-ant-...`, `sk-proj-...`, `AKIA...`, GLM `{32hex}.{16alphanum}`, GitHub tokens, SHA-1-shaped hex) from every message before writing to `raw/`. Replaced with `[REDACTED:<kind>]` inline. This is belt-and-suspenders on top of the hard-exclude blocklist — if you paste a key into a Claude session, it won't leak into git.
 
 ## Layer 1 — Device agent
 

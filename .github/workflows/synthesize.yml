@@ -72,16 +72,20 @@ jobs:
             echo "::notice::No raw/sessions-${{ steps.date.outputs.date }}.json — no device has synced yet."
           fi
 
-      - name: Summarize per-session (Haiku)
+      - name: Summarize per-session
         if: steps.check.outputs.has_data == 'true'
         env:
+          GLM_API_KEY: ${{ secrets.GLM_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          LLM_PROVIDER: ${{ vars.LLM_PROVIDER }}
         run: python scripts/summarize.py --date "${{ steps.date.outputs.date }}"
 
-      - name: Synthesize daily (Sonnet)
+      - name: Synthesize daily
         if: steps.check.outputs.has_data == 'true'
         env:
+          GLM_API_KEY: ${{ secrets.GLM_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          LLM_PROVIDER: ${{ vars.LLM_PROVIDER }}
         run: python scripts/synthesize.py --date "${{ steps.date.outputs.date }}"
 
       - name: Commit report

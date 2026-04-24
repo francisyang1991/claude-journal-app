@@ -43,6 +43,34 @@ def parse_date(s: str) -> datetime:
     return datetime.strptime(s, "%Y-%m-%d").replace(tzinfo=timezone.utc)
 
 
+# Patterns for common secret formats. Matches are replaced with [REDACTED:<kind>]
+# before the message hits raw/. This is belt-and-suspenders; the hard-exclude
+# PII regex catches payment-card shapes, this catches API keys the user may
+# have pasted into a session.
+_SECRET_PATTERNS = [
+    # Anthropic
+    (re.compile(r"sk-ant-[A-Za-z0-9_\-]{20,}"), "anthropic"),
+    # OpenAI (classic + project-scoped)
+    (re.compile(r"sk-(?:proj-)?[A-Za-z0-9_\-]{20,}"), "openai"),
+    # Zhipu GLM: 32 hex + '.' + 16 alphanum
+    (re.compile(r"\b[0-9a-f]{32}\.[A-Za-z0-9]{16}\b"), "glm"),
+    # AWS access key IDs
+    (re.compile(r"\bAKIA[0-9A-Z]{16}\b"), "aws-access-key"),
+    # GitHub tokens
+    (re.compile(r"\bghp_[A-Za-z0-9]{30,}\b"), "github"),
+    (re.compile(r"\bghs_[A-Za-z0-9]{30,}\b"), "github-server"),
+    # Generic 40-char hex (SHA-1 / many tokens)
+    (re.compile(r"\b[a-f0-9]{40}\b"), "hex40"),
+]
+
+
+def scrub_secrets(text: str) -> str:
+    out = text
+    for pat, kind in _SECRET_PATTERNS:
+        out = pat.sub(f"[REDACTED:{kind}]", out)
+    return out
+
+
 def within_day(ts_str: str, day_start: datetime, day_end: datetime) -> bool:
     try:
         ts = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
@@ -100,7 +128,7 @@ def extract_claude_code_sessions(date_str: str) -> list[dict]:
                             else:
                                 txt = ""
                             if txt.strip():
-                                msgs.append({"role": t, "text": txt[:4000]})
+                                msgs.append({"role": t, "text": scrub_secrets(txt[:4000])})
                     elif t == "last-prompt" and not title:
                         title = (d.get("lastPrompt") or "")[:80]
         except Exception as e:
@@ -113,7 +141,7 @@ def extract_claude_code_sessions(date_str: str) -> list[dict]:
             "source": "claude-code",
             "device": device_slug(),
             "cwd": cwd,
-            "title": title or f"Session {session_id[:8]}",
+            "title": scrub_secrets(title or f"Session {session_id[:8]}"),
             "started_at": ts_first,
             "ended_at": ts_last,
             "messages": msgs[:50],
@@ -163,7 +191,7 @@ def extract_cowork_sessions(date_str: str) -> list[dict]:
                         else:
                             txt = d.get("content") if isinstance(d.get("content"), str) else ""
                         if t in ("user", "assistant") and txt and txt.strip():
-                            msgs.append({"role": t, "text": txt[:4000]})
+                            msgs.append({"role": t, "text": scrub_secrets(txt[:4000])})
                         if len(msgs) >= 50:
                             break
             except Exception:
@@ -173,7 +201,7 @@ def extract_cowork_sessions(date_str: str) -> list[dict]:
             "source": "cowork",
             "device": device_slug(),
             "cwd": md.get("cwd") or (md.get("userSelectedFolders") or [None])[0],
-            "title": md.get("title") or f"Cowork {meta.stem[:12]}",
+            "title": scrub_secrets(md.get("title") or f"Cowork {meta.stem[:12]}"),
             "started_at": ts_first,
             "ended_at": ts_last,
             "messages": msgs,

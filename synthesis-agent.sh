@@ -12,8 +12,9 @@ PY="${PYTHON:-python3}"
 
 echo "==> [synthesis-agent] $DATE"
 
-if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
-  echo "FATAL: ANTHROPIC_API_KEY not set. Synthesis agent needs an API key."
+if [ -z "${GLM_API_KEY:-}" ] && [ -z "${ANTHROPIC_API_KEY:-}" ]; then
+  echo "FATAL: neither GLM_API_KEY nor ANTHROPIC_API_KEY is set."
+  echo "Set one of them (GLM is cheaper), or use LLM_PROVIDER=glm|anthropic to force."
   exit 1
 fi
 

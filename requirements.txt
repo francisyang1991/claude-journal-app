@@ -1,2 +1,4 @@
-anthropic>=0.40.0
 pyyaml>=6.0
+# Optional: anthropic SDK. Only needed if LLM_PROVIDER=anthropic (or only
+# ANTHROPIC_API_KEY is set). GLM uses stdlib urllib, no extra deps.
+anthropic>=0.40.0

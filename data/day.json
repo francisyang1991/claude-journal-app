@@ -10,9 +10,15 @@
   ],
   "sessions_total": 8,
   "sessions_kept": 6,
-  "honest": "\u2014",
-  "summary": "6 sessions across 2 topics.",
-  "lessons": [],
+  "honest": "Productive but fragmented, like context-switching between three different brain states.",
+  "summary": "Prepped for a tech interview while juggling product design for an AI coach and competitor analysis, with a brief detour into MetaGlass SDK setup.",
+  "lessons": [
+    "Dark navy/teal with amber makes slides pop without being distracting.",
+    "Direct push to main works when the change is small and scoped.",
+    "Real SDK docs often drift from bundled skill documentation.",
+    "Intersection strategy beats competing on single features.",
+    "Start users with small actions before showing the full plan."
+  ],
   "items": [
     {
       "topic": "tech",
@@ -21,10 +27,18 @@
       "start": "16:20",
       "dur": 51566,
       "title": "interviewPrep",
-      "body": "\u2014",
-      "decisions": [],
+      "body": "I was trying to create a 14-slide presentation for a 45-minute project deep dive interview based on the IDG revamp tech design document.",
+      "decisions": [
+        "Used dark navy/teal color palette with amber accents",
+        "Structured slides to match interview format: problem \u2192 architecture \u2192 implementation \u2192 evaluation \u2192 impact",
+        "Added dedicated \"Failures, Tradeoffs & Lessons\" slide",
+        "Incorporated comparison tables, stat callouts, and version timeline",
+        "Ensured each slide had visual elements and consistent layouts"
+      ],
       "open": [],
-      "artifacts": [],
+      "artifacts": [
+        "modified: /sessions/charming-youthful-wright/mnt/agent_sop/IDG_Revamp_Deep_Dive.pptx"
+      ],
       "sensitive": false
     },
     {
@@ -34,23 +48,44 @@
       "start": "09:05",
       "dur": 1,
       "title": "Fetch yage newsletter",
-      "body": "\u2014",
-      "decisions": [],
+      "body": "I was trying to fetch the latest newsletter from yage-ai.kit.com and save it to my SOP folder.",
+      "decisions": [
+        "Ran the fetch script as specified",
+        "Script successfully discovered and downloaded new posts",
+        "Converted posts to markdown format",
+        "Saved to newsletters/yage-ai/ directory"
+      ],
       "open": [],
-      "artifacts": [],
+      "artifacts": [
+        "added: newsletters/yage-ai/yage-ai-ai-2026-04-22.md"
+      ],
       "sensitive": false
     },
     {
-      "topic": "tech",
+      "topic": "health",
       "device": "mac",
       "source": "claude-code",
       "start": "09:29",
-      "dur": 444,
+      "dur": 838,
       "title": "Check files.zip for next task",
-      "body": "\u2014",
-      "decisions": [],
-      "open": [],
-      "artifacts": [],
+      "body": "I was trying to refine the AI goal coach product design after a brainstorming session.",
+      "decisions": [
+        "Shape B as the main product with AI coach as a sidecar",
+        "Use forms for initial onboarding, not chat",
+        "Start users with a small first action before showing full plan",
+        "Keep one primary plan with optional background habits",
+        "Generalize the seed plan to be universally health-positive"
+      ],
+      "open": [
+        "Need to write the actual PRD document",
+        "Need to conduct fresh competitive analysis for V2",
+        "Need to implement the plan schema and data migration"
+      ],
+      "artifacts": [
+        "modified: /competitive-brief",
+        "added: COMPETITIVE_BRIEF.md",
+        "added: Product PRD document (pending creation)"
+      ],
       "sensitive": false
     },
     {
@@ -60,10 +95,21 @@
       "start": "09:30",
       "dur": 5,
       "title": "Analyze competitors for product-management competitive brief",
-      "body": "\u2014",
-      "decisions": [],
-      "open": [],
-      "artifacts": [],
+      "body": "I wanted to analyze competitors for Cadence's family habit and purine food tracking app to identify differences and shared features.",
+      "decisions": [
+        "Focused on two MVP features: family-shared habit check-ins and purine food lookup",
+        "Identified direct competitors across habit apps and gout-specific apps",
+        "Analyzed key differentiators: read-only family sharing, combined habit+food database, bilingual support, PWA-first approach",
+        "Recommended protecting the intersection strategy rather than competing on single axes"
+      ],
+      "open": [
+        "Should we prioritize adding family sharing to counter \u75db\u98ce\u5feb\u597d's potential threat?",
+        "How to maintain lifestyle tone while expanding food database?",
+        "What's the plan for monitoring competitor moves in the gout+habit space?"
+      ],
+      "artifacts": [
+        "added: COMPETITIVE_BRIEF.md"
+      ],
       "sensitive": false
     },
     {
@@ -73,10 +119,15 @@
       "start": "11:47",
       "dur": 4,
       "title": "Push local code to remote",
-      "body": "\u2014",
-      "decisions": [],
+      "body": "I was trying to push my local code to the remote repository.",
+      "decisions": [
+        "Pushed staged changes to remote",
+        "Chose direct push to main over feature branch"
+      ],
       "open": [],
-      "artifacts": [],
+      "artifacts": [
+        "modified: path/to/file"
+      ],
       "sensitive": false
     },
     {
@@ -86,10 +137,28 @@
       "start": "14:28",
       "dur": 138,
       "title": "Set up MetaGlass SDK and explore app ideas",
-      "body": "\u2014",
-      "decisions": [],
-      "open": [],
-      "artifacts": [],
+      "body": "Set up MetaGlass SDK and explore app ideas for building a language learning app.",
+      "decisions": [
+        "Installed Meta DAT Claude skills into `.claude/skills/`",
+        "Scaffolding \"Look & Learn\" language immersion app as prototype",
+        "Using XcodeGen to generate Xcode project with SPM dependencies",
+        "Real SDK API is async (v0.6.0), not matching bundled skill docs"
+      ],
+      "open": [
+        "Swap StubVisionLabeler for real VLM (Claude Vision via anthropic SDK)",
+        "Test on real hardware via Meta AI registration flow",
+        "Add SRS scheduling and export-to-Anki button for retention/paywall hook"
+      ],
+      "artifacts": [
+        "modified: project.yml",
+        "added: LookAndLearn/App/LookAndLearnApp.swift",
+        "added: LookAndLearn/ViewModels/CaptureViewModel.swift",
+        "added: LookAndLearn/Services/VisionLabeler.swift",
+        "added: LookAndLearn/Views/CaptureView.swift",
+        "added: LookAndLearn/Views/DeckView.swift",
+        "added: LookAndLearn/Views/SettingsView.swift",
+        "added: README.md"
+      ],
       "sensitive": false
     }
   ],
@@ -97,7 +166,7 @@
     {
       "topic": "esd_unemployment",
       "device": "?",
-      "dur": 205
+      "dur": 598
     },
     {
       "topic": "wedding",
@@ -105,6 +174,29 @@
       "dur": 55800
     }
   ],
-  "decisions": [],
-  "open_threads": []
+  "decisions": [
+    "Used dark navy/teal color palette with amber accents",
+    "Structured slides to match interview format: problem \u2192 architecture \u2192 implementation \u2192 evaluation \u2192 impact",
+    "Added dedicated \"Failures, Tradeoffs & Lessons\" slide",
+    "Incorporated comparison tables, stat callouts, and version timeline",
+    "Ensured each slide had visual elements and consistent layouts",
+    "Ran the fetch script as specified",
+    "Script successfully discovered and downloaded new posts",
+    "Converted posts to markdown format",
+    "Saved to newsletters/yage-ai/ directory",
+    "Shape B as the main product with AI coach as a sidecar",
+    "Use forms for initial onboarding, not chat",
+    "Start users with a small first action before showing full plan"
+  ],
+  "open_threads": [
+    "Need to write the actual PRD document",
+    "Need to conduct fresh competitive analysis for V2",
+    "Need to implement the plan schema and data migration",
+    "Should we prioritize adding family sharing to counter \u75db\u98ce\u5feb\u597d's potential threat?",
+    "How to maintain lifestyle tone while expanding food database?",
+    "What's the plan for monitoring competitor moves in the gout+habit space?",
+    "Swap StubVisionLabeler for real VLM (Claude Vision via anthropic SDK)",
+    "Test on real hardware via Meta AI registration flow",
+    "Add SRS scheduling and export-to-Anki button for retention/paywall hook"
+  ]
 }
