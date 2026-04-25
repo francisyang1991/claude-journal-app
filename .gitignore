@@ -4,8 +4,14 @@ __pycache__/
 .DS_Store
 .claude-journal-state.json
 
-# raw/summaries-*.json is an intermediate artifact — synthesis agent writes it,
-# then reads it to produce data/day.json. We only commit raw/sessions-*.json
-# (device output) and data/day.json (final report).
-raw/summaries-*.json
+# Symlinks created by reader/serve.sh — point to $CLAUDE_JOURNAL_DATA_DIR.
+# Never tracked in the app repo; user data lives in the data repo.
+/data
+/memory
+/raw
+
+# Local config overrides (user-specific configs live in the data repo)
+config/topics.yaml
+config/hard_exclude.yaml
+config/sources.yaml
 

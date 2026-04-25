@@ -1,8 +1,0 @@
-# Enabled source adapters. One name per line; order determines collection order.
-# Available adapters: claude-code, cowork, cursor (see scripts/sources/__init__.py).
-#
-# Francis (this device): Claude Code + Cowork. No Cursor locally.
-# Yuwen would have: [cursor]
-sources:
-  - claude-code
-  - cowork

@@ -35,9 +35,9 @@ APP_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 mkdir -p "$TARGET"/{config,raw,data,memory}
 cd "$TARGET"
 
-# Copy starter configs from the app repo
-cp "$APP_ROOT/config/topics.yaml" config/topics.yaml
-cp "$APP_ROOT/config/hard_exclude.yaml" config/hard_exclude.yaml
+# Copy starter configs from the app repo's templates
+cp "$APP_ROOT/config/templates/topics.yaml" config/topics.yaml
+cp "$APP_ROOT/config/templates/hard_exclude.yaml" config/hard_exclude.yaml
 
 # Generate sources.yaml from the user's chosen list
 {

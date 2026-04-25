@@ -1,0 +1,13 @@
+# Enabled source adapters for this user. Copy to your data repo and trim to
+# the tools you actually use. Adapters whose tool isn't installed on a given
+# device self-skip via is_available() — no harm in listing more than you use.
+#
+# Available adapters (see scripts/sources/__init__.py):
+#   claude-code   ~/.claude/projects/*/*.jsonl
+#   cowork        ~/Library/Application Support/Claude/local-agent-mode-sessions/
+#   cursor        ~/Library/Application Support/Cursor/User/globalStorage/state.vscdb
+
+sources:
+  - claude-code
+  - cowork
+  - cursor

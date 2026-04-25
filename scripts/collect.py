@@ -40,11 +40,14 @@ def data_dir() -> Path:
 
 
 def config_path(data: Path, name: str) -> Path:
-    """Look up a config file. Prefer data-repo copy; fall back to app-repo copy."""
+    """Look up a config file. Prefer data-repo copy; fall back to app-repo template."""
     data_copy = data / "config" / name
     if data_copy.exists():
         return data_copy
-    return APP_ROOT / "config" / name
+    template = APP_ROOT / "config" / "templates" / name
+    if template.exists():
+        return template
+    return APP_ROOT / "config" / name  # legacy fallback
 
 
 # ── hard-exclude ─────────────────────────────────────────────────────────────

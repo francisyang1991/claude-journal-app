@@ -1,0 +1,23 @@
+# Hard-exclude blocklist — generic template. Copy to your data repo and
+# customize for your sensitive topics.
+#
+# Sessions matching ANY pattern get dropped before summarization — content
+# never enters raw/ or memory/. Match is on lowered session content (title +
+# cwd + first ~12k tokens of messages).
+#
+# Always keep the PII patterns — they catch credit cards and SSNs.
+
+patterns:
+  # Example category: replace with your own
+  # - name: legal
+  #   any_of: ["lawsuit", "settlement", "deposition"]
+  #
+  # - name: personal_finance
+  #   any_of: ["account number", "routing number"]
+
+  # Regulated PII — always exclude
+  - name: pii
+    regex:
+      - '\b\d{3}-\d{2}-\d{4}\b'                         # SSN
+      - '\b4[0-9]{12}(?:[0-9]{3})?\b'                    # Visa
+      - '\b5[1-5][0-9]{14}\b'                            # MC
