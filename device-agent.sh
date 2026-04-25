@@ -2,24 +2,31 @@
 # Layer 1 — Device agent. Runs on every device on a schedule.
 # Responsibilities: collect today's sessions, apply hard-exclude, push to git.
 # No LLM calls. No API key required.
+#
+# Reads/writes session data via $CLAUDE_JOURNAL_DATA_DIR (the user's data repo).
+# If unset, defaults to the app repo's working dir for legacy single-repo use.
 
 set -euo pipefail
-cd "$(dirname "$0")"
+APP_ROOT="$(cd "$(dirname "$0")" && pwd)"
+DATA_DIR="${CLAUDE_JOURNAL_DATA_DIR:-$APP_ROOT}"
 
 DATE="${1:-$(date +%Y-%m-%d)}"
 PY="${PYTHON:-python3}"
 DEVICE="${DEVICE_SLUG:-$(hostname -s | tr '[:upper:]' '[:lower:]')}"
 
 echo "==> [device-agent] $DEVICE · $DATE"
+echo "    app:  $APP_ROOT"
+echo "    data: $DATA_DIR"
 
-# Collect: walks ~/.claude/projects/ and Cowork sessions → raw/sessions-DATE.json
-"$PY" scripts/collect.py --date "$DATE"
+# Collect: walks Claude Code, Cowork, Cursor sessions → $DATA_DIR/raw/sessions-DATE.json
+cd "$APP_ROOT"
+CLAUDE_JOURNAL_DATA_DIR="$DATA_DIR" "$PY" scripts/collect.py --date "$DATE"
 
-# Git handoff to synthesis layer. Skip gracefully if not a repo yet.
-if [ -d .git ]; then
-  # Pull first so we don't push a stale branch
+# Git handoff to synthesis layer happens IN THE DATA REPO (not app repo).
+if [ -d "$DATA_DIR/.git" ]; then
+  cd "$DATA_DIR"
   git pull --rebase --autostash 2>/dev/null || true
-  git add raw/ config/ || true
+  git add raw/ config/ 2>/dev/null || true
   if ! git diff --cached --quiet; then
     git commit -m "chore(${DEVICE}): sessions ${DATE} $(date +%H:%M)" --no-verify
     git push 2>&1 | tail -3 || echo "[device-agent] push skipped (no remote configured yet)"
@@ -27,7 +34,7 @@ if [ -d .git ]; then
     echo "[device-agent] no new session data to commit"
   fi
 else
-  echo "[device-agent] not a git repo — skipping sync. Run 'git init' to enable."
+  echo "[device-agent] $DATA_DIR is not a git repo — skipping sync."
 fi
 
 echo "==> [device-agent] done"
