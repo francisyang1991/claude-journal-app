@@ -85,19 +85,51 @@ The workflow file is already in the repo at `.github/workflows/synthesize.yml`. 
 
 GitHub Actions is preferable when you have 2+ devices because synthesis runs even if all your laptops are asleep.
 
-## 5 — Read from any device
+## 5 — Daily pull on every device (background refresh)
 
-Once data is syncing, on any device:
+So the reader and coach.py always show fresh state without you remembering to pull manually. Cheap (no LLM, no API), runs in the background.
+
+**macOS (launchd):** add a second `StartCalendarInterval` to the same plist as device-agent, or create `~/Library/LaunchAgents/com.francis.journal-pull.plist`:
+```xml
+<?xml version="1.0"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>com.francis.journal-pull</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string><string>-lc</string>
+    <string>cd ~/claude-journal-app && ./scripts/sync.sh</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <dict><key>Hour</key><integer>7</integer><key>Minute</key><integer>0</integer></dict>
+  <key>StandardOutPath</key><string>/tmp/claude-journal-pull.log</string>
+</dict></plist>
+```
+```bash
+launchctl load ~/Library/LaunchAgents/com.francis.journal-pull.plist
+```
+
+**Linux (cron):**
+```cron
+0 7 * * * cd ~/claude-journal-app && ./scripts/sync.sh >> ~/.journal-sync.log 2>&1
+```
+
+7 AM is the default — runs after overnight synthesis (which happens at 23:00 in Step 3) so you wake up to fresh threads. Adjust to taste.
+
+**Note:** Devices that already run `./device-agent.sh` on a schedule pull as a side effect, so this step is most useful for read-only devices (an iPad-adjacent Mac you only browse from).
+
+## 6 — Read from any device
+
 ```bash
 cd ~/claude-journal-app
-git -C ~/francis-journal-data pull   # get the latest
-python3 -m http.server 8765
+./scripts/sync.sh                    # one-shot pull (or rely on the daily cron above)
+./reader/serve.sh                    # symlinks data dir, starts the reader at :8765
 open http://localhost:8765/reader/
 ```
 
 The reader's date pager (`← prev | next →`) walks the full history. The Threads view shows the long-term memory across every device that contributed.
 
-## 6 — Optional: install the SessionStart coach hook on every device
+## 7 — Optional: install the SessionStart coach hook on every device
 
 ```bash
 cd ~/claude-journal-app
@@ -106,7 +138,7 @@ cd ~/claude-journal-app
 
 Each device's coach reads from the locally-pulled data repo, so the hook works offline. As long as `git pull` runs sometimes (manually or via cron), threads stay fresh.
 
-## 7 — Optional: onboard Yuwen
+## 8 — Optional: onboard Yuwen
 
 ```bash
 cd ~/claude-journal-app
@@ -116,7 +148,7 @@ cd ~/claude-journal-app
 
 She gets a fully isolated journal using only the Cursor adapter. See `docs/migration.md` Step 6 for the full flow.
 
-## 8 — Optional: shared household-vault for skills + plans
+## 9 — Optional: shared household-vault for skills + plans
 
 Create one more private repo (`household-vault`), invite Yuwen as collaborator. See `docs/migration.md` Step 7.
 
