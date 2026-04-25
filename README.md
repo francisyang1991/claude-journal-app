@@ -84,6 +84,19 @@ launchctl load ~/Library/LaunchAgents/com.francis.claude-journal.plist
 0 13,23 * * * cd /path/to/claude-journal && ./device-agent.sh >> ~/.claude-journal.log 2>&1
 ```
 
+### Daily background pull (every device)
+
+So the reader and coach.py always see fresh data without you remembering to pull. Devices that already run device-agent on a schedule pull as a side effect; this is for read-only devices or as an extra morning refresh.
+
+**macOS:** `~/Library/LaunchAgents/com.francis.journal-pull.plist` running at 07:00 — see [docs/multi-device-checklist.md §5](docs/multi-device-checklist.md) for the exact plist.
+
+**Linux:**
+```cron
+0 7 * * * cd /path/to/claude-journal && ./scripts/sync.sh >> ~/.journal-sync.log 2>&1
+```
+
+`./scripts/sync.sh` is a one-liner: `git -C $CLAUDE_JOURNAL_DATA_DIR pull --rebase --autostash`.
+
 ## Layer 2 — Synthesis agent
 
 Runs centrally. Two options:
