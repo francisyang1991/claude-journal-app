@@ -22,13 +22,29 @@ echo "    data: $DATA_DIR"
 cd "$APP_ROOT"
 CLAUDE_JOURNAL_DATA_DIR="$DATA_DIR" "$PY" scripts/collect.py --date "$DATE"
 
+# Sync Claude memory (per-device, per-project) → $DATA_DIR/memory/<device>/<project>/
+MEM_ROOT="$HOME/.claude/projects"
+MEM_OUT="$DATA_DIR/memory/$DEVICE"
+if [ -d "$MEM_ROOT" ]; then
+  mkdir -p "$MEM_OUT"
+  count=0
+  for d in "$MEM_ROOT"/*/memory; do
+    [ -d "$d" ] || continue
+    proj="$(basename "$(dirname "$d")")"
+    mkdir -p "$MEM_OUT/$proj"
+    rsync -a --delete "$d/" "$MEM_OUT/$proj/"
+    count=$((count + 1))
+  done
+  echo "[memory] synced $count project memory dirs → $MEM_OUT"
+fi
+
 # Git handoff to synthesis layer happens IN THE DATA REPO (not app repo).
 if [ -d "$DATA_DIR/.git" ]; then
   cd "$DATA_DIR"
   git pull --rebase --autostash 2>/dev/null || true
-  git add raw/ config/ 2>/dev/null || true
+  git add raw/ config/ memory/ 2>/dev/null || true
   if ! git diff --cached --quiet; then
-    git commit -m "chore(${DEVICE}): sessions ${DATE} $(date +%H:%M)" --no-verify
+    git commit -m "chore(${DEVICE}): sessions+memory ${DATE} $(date +%H:%M)" --no-verify
     git push 2>&1 | tail -3 || echo "[device-agent] push skipped (no remote configured yet)"
   else
     echo "[device-agent] no new session data to commit"
