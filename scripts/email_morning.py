@@ -159,6 +159,10 @@ def send_resend(subject: str, html: str) -> None:
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
+            # Resend sits behind Cloudflare's WAF, which blocks the default
+            # Python-urllib UA with a 1010. A regular UA passes cleanly.
+            "User-Agent": "claude-journal/1.0 (+https://github.com/francisyang1991/claude-journal-app)",
+            "Accept": "application/json",
         },
         method="POST",
     )
