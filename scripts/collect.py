@@ -166,20 +166,64 @@ def main() -> int:
 
     kept_dicts.sort(key=lambda s: s["started_at"])
 
+    # Stamp this device on every session/dropped entry so the merge below can
+    # safely strip-and-replace just our contributions, leaving other devices'
+    # entries intact.
+    me = device_slug()
+    now_iso = datetime.now(timezone.utc).isoformat()
+    for d in kept_dicts:
+        d.setdefault("device", me)
+    for d in dropped:
+        d.setdefault("device", me)
+
     raw_dir = data / "raw"
     raw_dir.mkdir(parents=True, exist_ok=True)
     out_path = raw_dir / f"sessions-{args.date}.json"
+
+    # ── multi-device merge ─────────────────────────────────────────────────
+    # Read existing shard (if another device wrote earlier today), strip our
+    # own prior entries, then append fresh. Last-writer-wins for OUR entries
+    # only — never for other devices'.
+    existing = {}
+    if out_path.exists():
+        try:
+            existing = json.loads(out_path.read_text())
+        except Exception as e:
+            print(f"[collect] warn: existing shard unreadable ({e}); starting fresh",
+                  file=sys.stderr)
+            existing = {}
+
+    other_kept = [s for s in (existing.get("kept") or []) if s.get("device") != me]
+    other_dropped = [s for s in (existing.get("filtered_out") or []) if s.get("device") != me]
+
+    merged_kept = sorted(other_kept + kept_dicts, key=lambda s: s.get("started_at") or "")
+    merged_dropped = other_dropped + dropped
+
+    # Per-device summary, including this run's contribution.
+    devices = dict(existing.get("devices") or {})
+    devices[me] = {
+        "sessions": len(kept_dicts),
+        "filtered_out": len(dropped),
+        "last_sync": now_iso,
+    }
+
     payload = {
         "date": args.date,
-        "device": device_slug(),
-        "generated_at": datetime.now(timezone.utc).isoformat(),
-        "sessions_total": len(all_sessions),
-        "sessions_kept": len(kept_dicts),
-        "kept": kept_dicts,
-        "filtered_out": dropped,
+        "schema": 2,
+        "generated_at": now_iso,
+        "devices": devices,
+        "sessions_total": len(merged_kept) + len(merged_dropped),
+        "sessions_kept": len(merged_kept),
+        "kept": merged_kept,
+        "filtered_out": merged_dropped,
     }
     out_path.write_text(json.dumps(payload, indent=2))
-    print(f"[collect] wrote {out_path} — {len(kept_dicts)} kept, {len(dropped)} dropped", file=sys.stderr)
+    print(
+        f"[collect] wrote {out_path} — {len(merged_kept)} kept "
+        f"({len(kept_dicts)} from {me}, {len(other_kept)} from other devices), "
+        f"{len(merged_dropped)} dropped",
+        file=sys.stderr,
+    )
     return 0
 
 
